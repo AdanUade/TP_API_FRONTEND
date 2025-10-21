@@ -1,0 +1,68 @@
+@import "tailwindcss";
+body {
+    font-family: 'Bangers', cursive, sans-serif;
+    background-color: #edf2f7; /* bg-gray-200 */
+    background-image: radial-gradient(#cbd5e0 1px, transparent 1px); /* Puntos grises */
+    background-size: 15px 15px;
+}
+
+.font-sans {
+    font-family: 'Source Sans Pro', sans-serif;
+}
+
+.text-shadow {
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.text-shadow-Title {
+     filter: drop-shadow(4px 4px 0 #000); /* Sombra más pronunciada para títulos */
+}
+
+.hover-bandera {
+  /* La transición ya no es necesaria para el color, pero no molesta */
+transition: color 0.3s ease; 
+}
+
+.hover-bandera:hover {
+background-image: linear-gradient(
+to bottom,
+#75AADB 0%,   /* Celeste */
+#75AADB 33%,
+#FFFFFF 33%,  /* Blanco */
+#FFFFFF 67%,
+#75AADB 67%,  /* Celeste */
+#75AADB 100%
+);
+
+-webkit-background-clip: text; 
+background-clip: text;
+
+color: transparent;
+}
+
+/* Animación shake para errores */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-10px); }
+  20%, 40%, 60%, 80% { transform: translateX(10px); }
+}
+
+.animate-shake {
+  animation: shake 0.5s ease-in-out;
+}
+
+/* Animación slide-in para notificaciones */
+@keyframes slide-in {
+  from {
+    transform: translateX(400px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.animate-slide-in {
+  animation: slide-in 0.3s ease-out;
+}
