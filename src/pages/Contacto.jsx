@@ -30,8 +30,6 @@ const Contacto = () => {
             return;
         }
         
-        console.log('Mensaje enviado:', formData);
-
         setError('');
         setIsSubmitted(true);
         setFormData({

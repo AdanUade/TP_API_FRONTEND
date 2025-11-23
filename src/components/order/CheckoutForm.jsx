@@ -36,7 +36,6 @@ const CheckoutForm = () => {
     // Handle success
     useEffect(() => {
         if (success && currentOrder) {
-             console.log('✅ Orden creada exitosamente:', currentOrder);
              dispatch(clearCart());
              navigate('/perfil/orders', {
                  state: {
