@@ -1,7 +1,7 @@
 import { useDispatch } from 'react-redux';
 import { updateQuantity, removeFromCart } from '../../store/cartSlice';
-import {QuantitySelector, PriceDisplay, Button} from '../generico'
-import CardImage from '../products/productCard/CardImage';
+import { QuantitySelector, PriceDisplay, Button } from '../common';
+import CardImage from '../products/CardImage';
 import { formatPrice,calculateItemPrice, calculateItemSubtotal } from '../../utils';
 
 const CartItem = ({ item, image }) => {

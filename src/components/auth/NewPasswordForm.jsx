@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { updateUserMe } from '../../api/UserApi';
-import { useAsync } from '../../hooks/useAsync';
+import { useDispatch, useSelector } from 'react-redux';
+import { updatePassword } from '../../store/userSlice';
 import { useForm } from '../../hooks/useForm';
 import { isValidPassword } from '../../utils/validators';
 import Button from '../common/Button';
@@ -12,7 +12,8 @@ const MIN_PASSWORD_LENGTH = 8;
 
 const NewPasswordForm = () => {
     const navigate = useNavigate();
-    const { isLoading, error, execute } = useAsync();
+    const dispatch = useDispatch();
+    const { isLoading, error } = useSelector(state => state.user);
     const [success, setSuccess] = useState(false);
 
     const validationRules = useMemo(() => ({
@@ -21,14 +22,13 @@ const NewPasswordForm = () => {
     }), []);
 
     const handleUpdatePassword = async (formValues) => {
-        await execute(async () => {
-            await updateUserMe({ password: formValues.newPassword });
+        const resultAction = await dispatch(updatePassword({ password: formValues.newPassword }));
+        if (updatePassword.fulfilled.match(resultAction)) {
             setSuccess(true);
-            
             setTimeout(() => {
                 navigate('/perfil');
             }, 2000);
-        });
+        }
     };
 
     const {

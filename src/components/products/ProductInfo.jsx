@@ -1,4 +1,4 @@
-import { PriceDisplay, StockStatus } from '../../generico';
+import { PriceDisplay, StockStatus } from '../common';
 
 const ProductInfo = ({ product, finalPrice, oldPrice, discount, isOutOfStock, onSale }) => {
     return (

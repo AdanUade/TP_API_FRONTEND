@@ -1,6 +1,6 @@
 import { Link, useNavigate } from 'react-router-dom';
 import UserIcon from '../../assets/icons/user-icon.svg?react';
-import Button from '../generico/Button';
+import Button from '../common/Button';
 import { useSelector, useDispatch } from 'react-redux';
 import { logoutUser } from '../../store/userSlice';
 

@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
-import Button from '../../generico/Button';
-import QuantitySelector from '../../generico/QuantitySelector';
+import Button from '../common/Button';
+import QuantitySelector from '../common/QuantitySelector';
 
 /**
  * Sección de acciones del producto (cantidad, añadir al carrito, navegación)

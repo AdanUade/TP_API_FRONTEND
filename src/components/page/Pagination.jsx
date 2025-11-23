@@ -1,4 +1,4 @@
-import Button from '../generico/Button';
+import Button from '../common/Button';
 
 const getPageNumbers = ({ totalPages, currentPage, siblingCount = 1 }) => {
     if (totalPages <= 7) { // Show all pages if 7 or less

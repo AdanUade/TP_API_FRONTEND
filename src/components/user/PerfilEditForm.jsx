@@ -1,9 +1,7 @@
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { updateUserMe } from '../../api/UserApi';
 import { useSelector, useDispatch } from 'react-redux';
-import { refreshUser } from '../../store/userSlice';
-import { useAsync } from '../../hooks/useAsync';
+import { updateProfile } from '../../store/userSlice';
 import { useForm } from '../../hooks/useForm';
 import { isValidEmail } from '../../utils/validators';
 import FormField from '../common/FormField';
@@ -14,9 +12,8 @@ const MIN_NAME_LENGTH = 3;
 
 const PerfilEditForm = () => {
     const dispatch = useDispatch();
-    const { user } = useSelector(state => state.user);
+    const { user, isLoading, error } = useSelector(state => state.user);
     const navigate = useNavigate();
-    const { isLoading, error, execute } = useAsync();
     const [success, setSuccess] = useState(false);
 
     const validationRules = useMemo(() => ({
@@ -25,23 +22,22 @@ const PerfilEditForm = () => {
     }), []);
 
     const handleUpdateProfile = async (formValues) => {
-        await execute(async () => {
-            const updatedData = {};
-            if (formValues.name !== user?.name) updatedData.name = formValues.name;
-            if (formValues.email !== user?.email) updatedData.email = formValues.email;
+        const updatedData = {};
+        if (formValues.name !== user?.name) updatedData.name = formValues.name;
+        if (formValues.email !== user?.email) updatedData.email = formValues.email;
 
-            if (Object.keys(updatedData).length === 0) {
-                throw new Error('No hay cambios para guardar');
-            }
+        if (Object.keys(updatedData).length === 0) {
+            // TODO: Handle 'no changes' closer to UI or ignore
+            return;
+        }
 
-            await updateUserMe(updatedData);
-            await dispatch(refreshUser());
-            
+        const resultAction = await dispatch(updateProfile(updatedData));
+        if (updateProfile.fulfilled.match(resultAction)) {
             setSuccess(true);
             setTimeout(() => {
                 navigate('/perfil');
             }, 2000);
-        });
+        }
     };
 
     const {

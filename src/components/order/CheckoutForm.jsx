@@ -6,8 +6,8 @@ import { createNewOrder, resetOrderSuccess, clearOrderError } from '../../store/
 import { useCheckoutValidation } from '../../hooks';
 import ShippingForm from './ShippingForm';
 import PaymentForm from './PaymentForm';
-import Button from '../generico/Button';
-import ErrorGenerico from '../generico/ErrorGenerico';
+import Button from '../common/Button';
+import ErrorGenerico from '../common/ErrorGenerico';
 
 const CheckoutForm = () => {
     const { user } = useSelector(state => state.user);

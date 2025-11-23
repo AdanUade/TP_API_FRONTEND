@@ -1,9 +1,7 @@
 import { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { register, saveToken } from '../../api/AuthApi';
-import { useDispatch } from 'react-redux';
-import { refreshUser } from '../../store/userSlice';
-import { useAsync } from '../../hooks/useAsync';
+import { useDispatch, useSelector } from 'react-redux';
+import { registerUser } from '../../store/userSlice';
 import { useForm } from '../../hooks/useForm';
 import { isValidEmail, isValidPassword } from '../../utils/validators';
 import Button from '../common/Button';
@@ -16,7 +14,7 @@ const MIN_NAME_LENGTH = 3;
 const RegisterForm = () => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
-    const { isLoading, error, execute } = useAsync();
+    const { isLoading, error } = useSelector(state => state.user);
 
     const validationRules = useMemo(() => ({
         name: (value) => value.trim().length >= MIN_NAME_LENGTH,
@@ -26,18 +24,16 @@ const RegisterForm = () => {
     }), []);
 
     const handleRegister = async (formValues) => {
-        await execute(async () => {
-            const response = await register({
-                name: formValues.name,
-                email: formValues.email,
-                password: formValues.password,
-                rol: 'USER'
-            });
+        const resultAction = await dispatch(registerUser({
+            name: formValues.name,
+            email: formValues.email,
+            password: formValues.password,
+            rol: 'USER'
+        }));
 
-            saveToken(response.access_token);
-            await dispatch(refreshUser());
+        if (registerUser.fulfilled.match(resultAction)) {
             navigate('/', { replace: true });
-        });
+        }
     };
 
     const {

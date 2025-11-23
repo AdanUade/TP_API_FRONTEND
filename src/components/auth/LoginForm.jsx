@@ -1,9 +1,8 @@
 import { useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { authenticate, saveToken } from '../../api';
-import { useDispatch } from 'react-redux';
-import { refreshUser } from '../../store/userSlice';
-import { useAsync, useForm } from '../../hooks';
+import { useDispatch, useSelector } from 'react-redux';
+import { loginUser } from '../../store/userSlice';
+import { useForm } from '../../hooks';
 import { isValidEmail, isNotEmpty } from '../../utils';
 import { Button, ErrorGenerico as ErrorForm } from '../common';
 import FormField from '../common/FormField';
@@ -12,7 +11,7 @@ const LoginForm = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const dispatch = useDispatch();
-    const { isLoading, error, execute } = useAsync();
+    const { isLoading, error } = useSelector(state => state.user);
     
     const from = location.state?.from || '/';
 
@@ -22,12 +21,10 @@ const LoginForm = () => {
     }), []);
 
     const handleLogin = async (formValues) => {
-        await execute(async () => {
-            const response = await authenticate(formValues);
-            saveToken(response.access_token);
-            await dispatch(refreshUser());
+        const resultAction = await dispatch(loginUser(formValues));
+        if (loginUser.fulfilled.match(resultAction)) {
             navigate(from, { replace: true });
-        });
+        }
     };
 
     const {values,errors,isSubmitting,handleChange,handleBlur,handleSubmit} = useForm(

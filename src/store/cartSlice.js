@@ -159,26 +159,6 @@ export const updateQuantity = (productId, newQuantity) => (dispatch, getState) =
 
     const user = state.user.user;
     if (user && quantityDifference !== 0) {
-        // CartContext uses updateCart(productId, quantityDifference)
-        // Wait, I checked CartApi.js and it does:
-        // api.put(`${BASE_URL}`, { productId, quantity }, ...)
-        // This implies "quantity" is the amount to ADD or the NEW amount?
-        // In CartContext.jsx:
-        // syncWithBackend('update', productId, quantityDifference)
-        // -> calls CartApi.updateCart(productId, quantity) where quantity is quantityDifference.
-
-        // This suggests the backend adds the quantity provided?
-        // Or maybe CartContext was written assuming it's a difference?
-
-        // If I look at CartContext.jsx again:
-        /*
-        case 'update':
-            return CartApi.updateCart(productId, quantity)
-        */
-        // And updateQuantity calls: syncWithBackend('update', productId, quantityDifference);
-
-        // So yes, it passes the difference.
-
         CartApi.updateCart(productId, quantityDifference)
              .then(serverCart => {
                  if (serverCart.items) {

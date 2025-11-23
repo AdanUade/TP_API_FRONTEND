@@ -8,9 +8,9 @@ import PageTitle from '../components/page/PageTitle';
 import Button from '../components/common/Button';
 import ErrorGenerico from '../components/common/ErrorGenerico';
 import LoadingSpinner from '../components/common/LoadingSpinner';
-import CardImage from '../components/products/productCard/CardImage';
-import ProductInfo from '../components/products/productDetail/ProductInfo';
-import ProductActions from '../components/products/productDetail/ProductActions';
+import CardImage from '../components/products/CardImage';
+import ProductInfo from '../components/products/ProductInfo';
+import ProductActions from '../components/products/ProductActions';
 
 /**
  * Vista de detalle de producto para USUARIOS REGULARES

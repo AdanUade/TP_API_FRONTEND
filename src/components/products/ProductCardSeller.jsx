@@ -2,10 +2,10 @@ import { useNavigate } from 'react-router-dom';
 
 import { buildRoute } from '../../constants/routes';
 import { isProductOnSale, isProductOutOfStock, calculateFinalPrice } from '../../utils/productHelpers';
-import CardImage from './productCard/CardImage';
-import CardPrice from './productCard/CardPrice';
-import Button from '../generico/Button';
-import DeleteProductButton from '../generico/DeleteProductButton';
+import CardImage from './CardImage';
+import CardPrice from './CardPrice';
+import Button from '../common/Button';
+import DeleteProductButton from '../common/DeleteProductButton';
 
 const ProductCardSeller = ({ product, onDeleted }) => {
     const onSale = isProductOnSale(product);

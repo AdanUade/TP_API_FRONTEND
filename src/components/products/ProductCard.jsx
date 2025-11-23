@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
-import CardImage from './productCard/CardImage';
-import CardPrice from './productCard/CardPrice';
-import Button from '../generico/Button';
+import CardImage from './CardImage';
+import CardPrice from './CardPrice';
+import Button from '../common/Button';
 import { useDispatch } from 'react-redux';
 import { addToCart } from '../../store/cartSlice';
 import { isProductOnSale, isProductOutOfStock, calculateFinalPrice } from '../../utils/productHelpers';

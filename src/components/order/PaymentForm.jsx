@@ -1,4 +1,4 @@
-import Input from '../generico/Input';
+import Input from '../common/Input';
 
 const PaymentForm = ({ formData, onChange, isLoading }) => {
     return (

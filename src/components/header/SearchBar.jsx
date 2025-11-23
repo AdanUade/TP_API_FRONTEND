@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import SearchIcon from '../../assets/icons/search-icon.svg?react';
-import Button from '../generico/Button';
+import Button from '../common/Button';
 
 const SearchBar = () => {
     const [searchTerm, setSearchTerm] = useState('');

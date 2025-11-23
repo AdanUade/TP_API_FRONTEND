@@ -1,4 +1,4 @@
-import { formatPrice } from '../../../utils';
+import { formatPrice } from '../../utils';
 
 const CardPrice = ({ price, oldPrice, onSale }) => (
     <div className="flex items-baseline mb-4 mt-auto">

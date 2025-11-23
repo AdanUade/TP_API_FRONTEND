@@ -1,4 +1,4 @@
-import Button from '../generico/Button';
+import Button from '../common/Button';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth.js';
