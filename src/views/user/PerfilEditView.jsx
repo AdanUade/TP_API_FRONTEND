@@ -1,11 +1,11 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useUser } from '../../context/UserContext';
+import { useSelector } from 'react-redux';
 import PageTitle from '../../components/page/PageTitle';
 import PerfilEdit from '../../components/user/PerfilEdit';
 
 const PerfilEditView = () => {
-    const { user, isLoading } = useUser();
+    const { user, isLoading } = useSelector(state => state.user);
     const navigate = useNavigate();
 
     useEffect(() => {

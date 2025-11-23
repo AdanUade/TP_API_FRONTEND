@@ -1,15 +1,14 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useUser } from '../../context/UserContext';
-import { useCart } from '../../context/CartContext';
+import { useSelector } from 'react-redux';
 import PageTitle from '../../components/page/PageTitle';
 import CheckoutForm from '../../components/order/CheckoutForm';
 import LoadingSpinner from '../../components/generico/LoadingSpinner';
 import ErrorGenerico from '../../components/generico/ErrorGenerico';
 
 const Checkout = () => {
-    const { user, isLoading } = useUser();
-    const { cartItems } = useCart();
+    const { user, isLoading } = useSelector(state => state.user);
+    const { items: cartItems } = useSelector(state => state.cart);
     const navigate = useNavigate();
 
     useEffect(() => {
