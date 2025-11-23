@@ -9,6 +9,7 @@ import ErrorGenerico from '../common/ErrorGenerico';
 import { useDispatch, useSelector } from 'react-redux';
 import { createProduct, updateProduct } from '../../store/productSlice';
 import { getToken } from '../../api/AuthApi';
+import { toast } from 'react-toastify';
 
 const ProductForm = ({ product, onSuccess }) => {
     const isEditMode = Boolean(product);
@@ -57,6 +58,7 @@ const ProductForm = ({ product, onSuccess }) => {
 
         if (createProduct.fulfilled.match(resultAction) || updateProduct.fulfilled.match(resultAction)) {
             setSuccess(true);
+            toast.success(isEditMode ? 'Producto actualizado correctamente' : 'Producto creado exitosamente');
             if (onSuccess) onSuccess(resultAction.payload);
 
             if (!isEditMode) {
@@ -66,6 +68,8 @@ const ProductForm = ({ product, onSuccess }) => {
                     imageInputRef.current.value = '';
                 }
             }
+        } else {
+            toast.error('Error al guardar el producto');
         }
     };
     
