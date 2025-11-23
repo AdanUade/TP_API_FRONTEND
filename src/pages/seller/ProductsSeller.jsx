@@ -1,28 +1,25 @@
-import { getAllProducts } from "../../api/ProductApi";
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchProducts } from "../../store/productSlice";
 import { useAuth } from "../../hooks/useAuth.js";
-import { useProducts } from "../../hooks/useProducts.js";
 import { usePagination } from "../../hooks/usePagination.js";
 import PageTitle from "../../components/page/PageTitle";
 import ProductGrid from "../../components/products/ProductGrid";
-import ErrorGenerico from "../../components/generico/ErrorGenerico";
+import ErrorGenerico from "../../components/common/ErrorGenerico";
 import Pagination from "../../components/page/Pagination.jsx";
 
 const ProductsSeller = () => {
-    const { isSeller, isAdmin } = useAuth(); // Obtener también isAdmin
+    const dispatch = useDispatch();
+    const { isSeller, isAdmin } = useAuth();
     const { currentPage, handlePageChange } = usePagination();
     
-    const { 
-        products, 
-        isLoading, 
-        error, 
-        totalPages 
-    } = useProducts({
-        fetchFunction: getAllProducts,
-        page: currentPage,
-        size: 8,
-        dependencies: [isSeller, isAdmin, currentPage],
-        autoLoad: !!(isSeller || isAdmin) // Cargar si es Vendedor O Admin
-    });
+    const { items: products, isLoading, error, totalPages } = useSelector(state => state.products);
+
+    useEffect(() => {
+        if (isSeller || isAdmin) {
+            dispatch(fetchProducts({ page: currentPage, size: 8 }));
+        }
+    }, [dispatch, currentPage, isSeller, isAdmin]);
 
     if (error) {
         return (

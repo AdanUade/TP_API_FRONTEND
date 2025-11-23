@@ -5,8 +5,8 @@ import { useDispatch } from 'react-redux';
 import { refreshUser } from '../../store/userSlice';
 import { useAsync, useForm } from '../../hooks';
 import { isValidEmail, isNotEmpty } from '../../utils';
-import { Button, ErrorGenerico as ErrorForm } from '../generico';
-import FormField from './FormField';
+import { Button, ErrorGenerico as ErrorForm } from '../common';
+import FormField from '../common/FormField';
 
 const LoginForm = () => {
     const navigate = useNavigate();

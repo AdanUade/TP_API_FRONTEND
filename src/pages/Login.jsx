@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import PageTitle from '../components/page/PageTitle';
-import LoginForm from '../components/form/LoginForm';
+import LoginForm from '../components/auth/LoginForm';
 
 /**
  * Vista de inicio de sesión

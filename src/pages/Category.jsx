@@ -8,7 +8,7 @@ import PageTitle from '../components/page/PageTitle';
 import ProductFilters from '../components/products/ProductFilters';
 import ProductGrid from '../components/products/ProductGrid';
 import Pagination from '../components/page/Pagination';
-import ErrorGenerico from '../components/generico/ErrorGenerico';
+import ErrorGenerico from '../components/common/ErrorGenerico';
 
 // Usar hooks personalizados
 import { usePagination } from '../hooks/usePagination.js';

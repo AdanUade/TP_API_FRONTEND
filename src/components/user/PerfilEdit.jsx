@@ -1,4 +1,4 @@
-import { PerfilEditForm } from '../form';
+import PerfilEditForm from './PerfilEditForm';
 
 const PerfilEdit = () => {
     return (

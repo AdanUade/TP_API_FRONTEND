@@ -1,8 +1,8 @@
 import { useState} from 'react';
 import PageTitle from '../components/page/PageTitle.jsx';
-import ErrorForm from '../components/generico/ErrorGenerico.jsx';
-import Button from '../components/generico/Button.jsx';
-import Input from '../components/generico/Input.jsx';
+import ErrorForm from '../components/common/ErrorGenerico.jsx';
+import Button from '../components/common/Button.jsx';
+import Input from '../components/common/Input.jsx';
 
 const Contacto = () => {
     const [formData, setFormData] = useState({

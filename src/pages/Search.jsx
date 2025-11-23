@@ -3,9 +3,9 @@ import { useSearchParams } from "react-router-dom"
 import { useDispatch, useSelector } from "react-redux"
 import { searchProducts } from "../store/productSlice"
 import PageTitle from "../components/page/PageTitle"
-import ErrorGenerico from "../components/generico/ErrorGenerico"
+import ErrorGenerico from "../components/common/ErrorGenerico"
 import ProductGrid from "../components/products/ProductGrid"
-import LoadingSpinner from "../components/generico/LoadingSpinner"
+import LoadingSpinner from "../components/common/LoadingSpinner"
 import Pagination from "../components/page/Pagination"
 
 const Search = () => {

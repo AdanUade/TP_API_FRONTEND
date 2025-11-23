@@ -8,7 +8,7 @@ import PageTitle from '../components/page/PageTitle';
 import ProductFilters from '../components/products/ProductFilters';
 import ProductGrid from '../components/products/ProductGrid';
 import Pagination from '../components/page/Pagination';
-import ErrorForm from '../components/generico/ErrorGenerico';
+import ErrorForm from '../components/common/ErrorGenerico';
 
 const Sale = () => {
     const dispatch = useDispatch();

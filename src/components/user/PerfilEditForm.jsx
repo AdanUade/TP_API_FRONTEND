@@ -6,9 +6,9 @@ import { refreshUser } from '../../store/userSlice';
 import { useAsync } from '../../hooks/useAsync';
 import { useForm } from '../../hooks/useForm';
 import { isValidEmail } from '../../utils/validators';
-import FormField from './FormField';
-import Button from '../generico/Button';
-import ErrorGenerico from '../generico/ErrorGenerico';
+import FormField from '../common/FormField';
+import Button from '../common/Button';
+import ErrorGenerico from '../common/ErrorGenerico';
 
 const MIN_NAME_LENGTH = 3;
 

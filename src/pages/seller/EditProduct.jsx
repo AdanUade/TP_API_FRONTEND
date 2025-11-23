@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import PageTitle from '../../components/page/PageTitle';
-import ProductForm from '../../components/form/ProductForm';
+import ProductForm from '../../components/products/ProductForm';
 import { getProductById } from '../../api/ProductApi';
-import ErrorGenerico from '../../components/generico/ErrorGenerico';
-import LoadingSpinner from '../../components/generico/LoadingSpinner';
+import ErrorGenerico from '../../components/common/ErrorGenerico';
+import LoadingSpinner from '../../components/common/LoadingSpinner';
 
 const EditProduct = () => {
     const { productId } = useParams();

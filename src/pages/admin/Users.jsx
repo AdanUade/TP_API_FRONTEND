@@ -1,21 +1,20 @@
 import { getAllUsers } from "../../api/UserApi";
-import { useProducts } from "../../hooks/useProducts"; // Reusable for any paginated data
+import { usePaginatedFetch } from "../../hooks/usePaginatedFetch";
 import { usePagination } from "../../hooks/usePagination";
 import PageTitle from "../../components/page/PageTitle";
-import ErrorGenerico from "../../components/generico/ErrorGenerico";
-import LoadingSpinner from "../../components/generico/LoadingSpinner";
+import ErrorGenerico from "../../components/common/ErrorGenerico";
+import LoadingSpinner from "../../components/common/LoadingSpinner";
 import Pagination from "../../components/page/Pagination";
 
 const Users = () => {
     const { currentPage, handlePageChange } = usePagination();
     
-    // Reutilizamos useProducts para obtener datos paginados de usuarios
     const { 
-        products: users, // Renombramos 'products' a 'users' para mayor claridad
+        data: users,
         isLoading, 
         error, 
         totalPages 
-    } = useProducts({
+    } = usePaginatedFetch({
         fetchFunction: getAllUsers,
         page: currentPage,
         size: 10, 

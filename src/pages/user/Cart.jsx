@@ -4,8 +4,8 @@ import { useMemo } from 'react';
 import { useAuth } from '../../hooks/useAuth';
 import PageTitle from '../../components/page/PageTitle';
 import CartItem from '../../components/cart/CartItem';
-import Button from '../../components/generico/Button';
-import ErrorGenerico from '../../components/generico/ErrorGenerico';
+import Button from '../../components/common/Button';
+import ErrorGenerico from '../../components/common/ErrorGenerico';
 import { formatPrice } from '../../utils/formatters';
 import { calculateTotalSavings, calculateCartTotal } from '../../utils/cartHelpers';
 

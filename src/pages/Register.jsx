@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import PageTitle from '../components/page/PageTitle';
-import RegisterForm from '../components/form/RegisterForm';
+import RegisterForm from '../components/auth/RegisterForm';
 
 /**
  * Vista de registro de nuevos usuarios

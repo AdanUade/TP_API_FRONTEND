@@ -3,8 +3,8 @@ import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchMyOrders } from "../../store/orderSlice";
-import ErrorGenerico from "../../components/generico/ErrorGenerico";
-import LoadingSpinner from "../../components/generico/LoadingSpinner";
+import ErrorGenerico from "../../components/common/ErrorGenerico";
+import LoadingSpinner from "../../components/common/LoadingSpinner";
 import ItemOrder from "../../components/order/ItemOrder";
 
 const Orders = () => {

@@ -4,7 +4,7 @@ import { fetchProducts } from '../store/productSlice';
 import HeroBanner from '../components/page/HeroBanner';
 import PageTitle from '../components/page/PageTitle';
 import ProductGrid from "../components/products/ProductGrid";
-import ErrorGenerico from '../components/generico/ErrorGenerico';
+import ErrorGenerico from '../components/common/ErrorGenerico';
 import { useAuth } from '../hooks/useAuth.js';
 import SellerHome from './seller/SellerHome';
 import AdminHome from './admin/AdminHome';

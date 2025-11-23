@@ -1,16 +1,16 @@
 import { useEffect, useState } from 'react';
 import PageTitle from "../../components/page/PageTitle";
 import ProductCardSeller from '../../components/products/ProductCardSeller';
-import LoadingSpinner from '../../components/generico/LoadingSpinner';
-import ErrorGenerico from '../../components/generico/ErrorGenerico';
+import LoadingSpinner from '../../components/common/LoadingSpinner';
+import ErrorGenerico from '../../components/common/ErrorGenerico';
 import { getProductsOutOfStock } from '../../api/ProductApi';
-import { useProducts } from '../../hooks/useProducts.js';
+import { usePaginatedFetch } from '../../hooks/usePaginatedFetch.js';
 import { usePagination } from '../../hooks/usePagination.js';
 import Pagination from '../../components/page/Pagination.jsx';
 
 const SellerStock = () => {
     const { currentPage, handlePageChange } = usePagination();
-    const { isLoading, error, products, totalPages } = useProducts({
+    const { isLoading, error, data: products, totalPages } = usePaginatedFetch({
         fetchFunction: getProductsOutOfStock,
         page: currentPage,
         size: 8,

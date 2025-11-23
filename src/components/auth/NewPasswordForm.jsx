@@ -4,9 +4,9 @@ import { updateUserMe } from '../../api/UserApi';
 import { useAsync } from '../../hooks/useAsync';
 import { useForm } from '../../hooks/useForm';
 import { isValidPassword } from '../../utils/validators';
-import Button from '../generico/Button';
-import ErrorGenerico from '../generico/ErrorGenerico';
-import FormField from '../form/FormField';
+import Button from '../common/Button';
+import ErrorGenerico from '../common/ErrorGenerico';
+import FormField from '../common/FormField';
 
 const MIN_PASSWORD_LENGTH = 8;
 

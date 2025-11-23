@@ -3,8 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import PageTitle from '../../components/page/PageTitle';
 import CheckoutForm from '../../components/order/CheckoutForm';
-import LoadingSpinner from '../../components/generico/LoadingSpinner';
-import ErrorGenerico from '../../components/generico/ErrorGenerico';
+import LoadingSpinner from '../../components/common/LoadingSpinner';
+import ErrorGenerico from '../../components/common/ErrorGenerico';
 
 const Checkout = () => {
     const { user, isLoading } = useSelector(state => state.user);

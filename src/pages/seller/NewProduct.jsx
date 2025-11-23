@@ -1,7 +1,7 @@
 
 import { useState } from "react";
 import PageTitle from "../../components/page/PageTitle";
-import ProductForm from "../../components/form/ProductForm";
+import ProductForm from "../../components/products/ProductForm";
 
 const NewProduct = () => {
     const [formSuccess, setFormSuccess] = useState(false);

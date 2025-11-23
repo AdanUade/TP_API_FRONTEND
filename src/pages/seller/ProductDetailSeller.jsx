@@ -5,12 +5,12 @@ import { fetchProductById, clearSelectedProduct } from '../../store/productSlice
 import { buildRoute } from '../../constants/routes';
 import { isProductOutOfStock, isProductOnSale, calculateFinalPrice, getDiscountPercentage } from '../../utils/productHelpers';
 import PageTitle from '../../components/page/PageTitle';
-import Button from '../../components/generico/Button';
-import ErrorGenerico from '../../components/generico/ErrorGenerico';
-import LoadingSpinner from '../../components/generico/LoadingSpinner';
+import Button from '../../components/common/Button';
+import ErrorGenerico from '../../components/common/ErrorGenerico';
+import LoadingSpinner from '../../components/common/LoadingSpinner';
 import CardImage from '../../components/products/productCard/CardImage';
 import ProductInfo from '../../components/products/productDetail/ProductInfo';
-import DeleteProductButton from '../../components/generico/DeleteProductButton';
+import DeleteProductButton from '../../components/common/DeleteProductButton';
 
 /**
  * Vista de detalle de producto para VENDEDORES y ADMINISTRADORES
