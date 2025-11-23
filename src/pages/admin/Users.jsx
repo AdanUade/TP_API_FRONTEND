@@ -1,5 +1,6 @@
-import { getAllUsers } from "../../api/UserApi";
-import { usePaginatedFetch } from "../../hooks/usePaginatedFetch";
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchUsers } from "../../store/usersSlice";
 import { usePagination } from "../../hooks/usePagination";
 import PageTitle from "../../components/page/PageTitle";
 import ErrorGenerico from "../../components/common/ErrorGenerico";
@@ -7,19 +8,13 @@ import LoadingSpinner from "../../components/common/LoadingSpinner";
 import Pagination from "../../components/page/Pagination";
 
 const Users = () => {
+    const dispatch = useDispatch();
     const { currentPage, handlePageChange } = usePagination();
-    
-    const { 
-        data: users,
-        isLoading, 
-        error, 
-        totalPages 
-    } = usePaginatedFetch({
-        fetchFunction: getAllUsers,
-        page: currentPage,
-        size: 10, 
-        dependencies: [currentPage]
-    });
+    const { items: users, isLoading, error, totalPages } = useSelector(state => state.adminUsers);
+
+    useEffect(() => {
+        dispatch(fetchUsers({ page: currentPage, size: 10 }));
+    }, [dispatch, currentPage]);
 
     if (isLoading) {
         return <LoadingSpinner title="Cargando Usuarios..." />;
