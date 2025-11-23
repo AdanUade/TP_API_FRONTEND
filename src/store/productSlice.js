@@ -52,9 +52,9 @@ export const fetchProductById = createAsyncThunk(
 
 export const searchProducts = createAsyncThunk(
     'products/searchProducts',
-    async ({ query, ...params }, { rejectWithValue }) => {
+    async ({ query, page, size }, { rejectWithValue }) => {
         try {
-            const response = await ProductApi.searchProducts({ query, ...params });
+            const response = await ProductApi.searchProducts(query, page, size);
             return response;
         } catch (error) {
             return rejectWithValue(error.response?.data?.message || error.message);
