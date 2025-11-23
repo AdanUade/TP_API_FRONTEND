@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import Button from '../common/Button';
 
 const getPageNumbers = ({ totalPages, currentPage, siblingCount = 1 }) => {
@@ -32,7 +33,10 @@ const getPageNumbers = ({ totalPages, currentPage, siblingCount = 1 }) => {
 
 
 const Pagination = ({ currentPage, totalPages, onPageChange }) => {
-    const pageNumbers = getPageNumbers({ totalPages, currentPage });
+    const pageNumbers = useMemo(() =>
+        getPageNumbers({ totalPages, currentPage }),
+        [totalPages, currentPage]
+    );
 
     return (
         <div className="flex justify-center items-center gap-2 mt-12">

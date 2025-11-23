@@ -26,39 +26,20 @@ import EditProduct from "./pages/seller/EditProduct.jsx";
 import { Routes, Route } from "react-router-dom";
 import { ProtectedRoute, AdminRoute, SellerRoute, AuthenticatedRoute, GuestRoute } from "./components/routing";
 import { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { refreshUser } from "./store/userSlice";
-import { loadCartFromServer, syncGuestCartToServer, setCartItems } from "./store/cartSlice";
+import CartSynchronizer from "./components/common/CartSynchronizer";
 
 function App() {
     const dispatch = useDispatch();
-    const { user } = useSelector(state => state.user);
-    const { items: cartItems } = useSelector(state => state.cart);
 
     useEffect(() => {
         dispatch(refreshUser());
     }, [dispatch]);
 
-    useEffect(() => {
-        if (user) {
-            if (user.rol === 'SELLER' || user.rol === 'ADMIN') {
-                dispatch(setCartItems([]));
-                return;
-            }
-
-            if (cartItems.length > 0) {
-                 dispatch(syncGuestCartToServer(cartItems));
-            } else {
-                dispatch(loadCartFromServer());
-            }
-        } else {
-             dispatch(setCartItems([]));
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [user, dispatch]);
-
     return (
         <div className="flex flex-col min-h-screen">
+            <CartSynchronizer />
             <Header />
             <main className="container mx-auto px-4 py-8 flex-grow">
                 <Routes>

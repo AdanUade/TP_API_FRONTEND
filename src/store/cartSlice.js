@@ -1,6 +1,6 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk, createSelector } from '@reduxjs/toolkit';
 import * as CartApi from '../api/CartApi';
-import { adaptServerItemToLocal } from '../utils/cartHelpers';
+import { adaptServerItemToLocal, calculateCartTotal, calculateTotalItems, calculateTotalSavings } from '../utils/cartHelpers';
 
 export const loadCartFromServer = createAsyncThunk(
     'cart/loadCartFromServer',
@@ -109,6 +109,24 @@ const cartSlice = createSlice({
 });
 
 export const { setCartItems, localAddToCart, localRemoveFromCart, localUpdateQuantity, localClearCart, setIsSyncing } = cartSlice.actions;
+
+// Selectors
+export const selectCartItems = (state) => state.cart.items;
+
+export const selectCartTotal = createSelector(
+    [selectCartItems],
+    (items) => calculateCartTotal(items)
+);
+
+export const selectTotalItems = createSelector(
+    [selectCartItems],
+    (items) => calculateTotalItems(items)
+);
+
+export const selectCartSavings = createSelector(
+    [selectCartItems],
+    (items) => calculateTotalSavings(items)
+);
 
 // Thunks
 export const addToCart = ({ product, image, quantity = 1 }) => (dispatch, getState) => {
