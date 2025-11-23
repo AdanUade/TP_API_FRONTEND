@@ -1,10 +1,12 @@
 import { useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { deleteProduct } from '../../store/productSlice';
 import Button from './Button';
 import ErrorGenerico from './ErrorGenerico';
-import { deleteProduct } from '../../api/ProductApi';
 import { getToken } from '../../api/AuthApi';
 
 const DeleteProductButton = ({ productId, productName, onDeleted }) => {
+    const dispatch = useDispatch();
     const [confirming, setConfirming] = useState(false);
     const [deleted, setDeleted] = useState(false);
     const [message, setMessage] = useState(null);
@@ -18,25 +20,29 @@ const DeleteProductButton = ({ productId, productName, onDeleted }) => {
         setMessage(null);
         try {
             const token = getToken();
-            // debug: ensure token exists and log presence (avoid printing secret in logs by default)
             console.debug('DeleteProductButton: token present?', !!token);
             if (!token) {
                 throw new Error('No se encontró token de autenticación. Inicia sesión e intenta de nuevo.');
             }
-            await deleteProduct({ productId, token });
-            setMessage(`Producto "${productName}" eliminado correctamente`);
-            setDeleted(true);
-            setConfirming(false);
-            if (onDeleted) onDeleted(productId);
+
+            const resultAction = await dispatch(deleteProduct({ productId, token }));
+
+            if (deleteProduct.fulfilled.match(resultAction)) {
+                setMessage(`Producto "${productName}" eliminado correctamente`);
+                setDeleted(true);
+                setConfirming(false);
+                if (onDeleted) onDeleted(productId);
+            } else {
+                throw resultAction.payload || new Error('Error al eliminar');
+            }
         } catch (err) {
-            // err puede ser objeto parseado por handleResponse o Error
             console.error('DeleteProductButton: error deleting product', err);
             let msg = 'Error al eliminar el producto';
             if (err) {
                 if (typeof err === 'string') msg = err;
                 else if (err.message) msg = err.message;
                 else {
-                    try { msg = JSON.stringify(err); } catch { /* ignore stringify errors */ }
+                     try { msg = JSON.stringify(err); } catch { /* ignore */ }
                 }
             }
             setMessage(msg);

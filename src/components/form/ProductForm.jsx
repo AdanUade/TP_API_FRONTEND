@@ -6,16 +6,17 @@ import { PRODUCT_CATEGORIES } from '../../constants/productCategories';
 import FormField from './FormField';
 import Button from '../generico/Button';
 import ErrorGenerico from '../generico/ErrorGenerico';
-import { createProductWithImage, updateProduct } from '../../api/ProductApi';
+import { useDispatch, useSelector } from 'react-redux';
+import { createProduct, updateProduct } from '../../store/productSlice';
 import { getToken } from '../../api/AuthApi';
-import { useAsync } from '../../hooks/useAsync.js';
 
 const ProductForm = ({ product, onSuccess }) => {
     const isEditMode = Boolean(product);
     const navigate = useNavigate();
+    const dispatch = useDispatch();
     const [image, setImage] = useState(null);
     const imageInputRef = useRef(null);
-    const { isLoading, error, execute } = useAsync();
+    const { isLoading, error } = useSelector(state => state.products);
     const [success, setSuccess] = useState(false);
 
     const validationRules = useMemo(() => ({
@@ -46,15 +47,17 @@ const ProductForm = ({ product, onSuccess }) => {
             category: formValues.category
         };
 
-        const action = isEditMode
-            ? () => updateProduct({ productId: product.id, productRequest, token })
-            : () => createProductWithImage({ productRequest, image, token });
+        let resultAction;
 
-        const result = await execute(action).catch(() => null);
+        if (isEditMode) {
+             resultAction = await dispatch(updateProduct({ productId: product.id, productRequest, token }));
+        } else {
+             resultAction = await dispatch(createProduct({ productRequest, image, token }));
+        }
 
-        if (result !== null) {
+        if (createProduct.fulfilled.match(resultAction) || updateProduct.fulfilled.match(resultAction)) {
             setSuccess(true);
-            if (onSuccess) onSuccess(result);
+            if (onSuccess) onSuccess(resultAction.payload);
 
             if (!isEditMode) {
                 reset();
