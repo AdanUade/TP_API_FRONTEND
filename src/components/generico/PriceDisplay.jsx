@@ -1,5 +1,5 @@
 import { formatPrice } from '../../utils/formatters';
-import { getDiscountPercentage } from '../../utils/productHelpers';
+import { getDiscountPercentage , isProductOnSale} from '../../utils/productHelpers';
 
 const PriceDisplay = ({ 
     finalPrice, 
@@ -8,8 +8,8 @@ const PriceDisplay = ({
     size = 'large',
     showBadge = true 
 }) => {
-    const onSale = discount < 1;
-    const discountPercentage = getDiscountPercentage(originalPrice, discount);
+    const onSale = isProductOnSale({ discount });
+    const discountPercentage = getDiscountPercentage(discount);
     
     const sizes = {
         small: {

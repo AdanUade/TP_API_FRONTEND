@@ -1,18 +1,20 @@
 import { useNavigate } from 'react-router-dom';
-import { useCart } from '../context/CartContext';
-import { useAuth } from '../hooks/useAuth';
-import PageTitle from '../components/page/PageTitle';
-import CartItem from '../components/cart/CartItem';
-import Button from '../components/generico/Button';
-import ErrorGenerico from '../components/generico/ErrorGenerico';
-import { formatPrice } from '../utils/formatters';
-import { calculateTotalSavings } from '../utils/cartHelpers';
+import { useCart } from '../../context/CartContext';
+import { useAuth } from '../../hooks/useAuth';
+import PageTitle from '../../components/page/PageTitle';
+import CartItem from '../../components/cart/CartItem';
+import Button from '../../components/generico/Button';
+import ErrorGenerico from '../../components/generico/ErrorGenerico';
+import { formatPrice } from '../../utils/formatters';
+import { calculateTotalSavings } from '../../utils/cartHelpers';
 
 const Cart = () => {
     const navigate = useNavigate();
     const { isAuthenticated } = useAuth();
     const { cartItems, cartTotal } = useCart();
     const totalDiscount = calculateTotalSavings(cartItems);
+
+    console.log('Cart Items:', cartItems);
 
     const handleCheckout = () => {
         if (!isAuthenticated) {

@@ -48,7 +48,7 @@ export const ROUTES = {
         USERS: '/admin/users',
     },
 
-    // Deprecated (mantener por compatibilidad)
+    // Deprecated 
     SELLER_HOME: '/seller',
     SELLER_PRODUCTS: '/seller/products',
     SELLER_PRODUCT_NEW: '/seller/products/new',

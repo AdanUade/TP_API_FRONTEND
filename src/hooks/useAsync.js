@@ -1,11 +1,5 @@
 import { useState, useCallback } from 'react';
 
-/**
- * Hook genérico para manejar el estado de cualquier operación asíncrona (ej. llamadas a API).
- * Abstrae la lógica común de los estados de carga (isLoading), error (error) y datos (data).
- * 
- * @returns {{isLoading: boolean, error: string|null, data: any|null, execute: function, reset: function, isSuccess: boolean}} - Un objeto que contiene el estado de la operación y las funciones para controlarla.
- */
 export const useAsync = () => {
     // Estado para indicar si la operación está en curso.
     const [isLoading, setIsLoading] = useState(false);
@@ -14,10 +8,6 @@ export const useAsync = () => {
     // Estado para almacenar los datos obtenidos si la operación tiene éxito.
     const [data, setData] = useState(null);
 
-    /**
-     * Función que envuelve y ejecuta la operación asíncrona.
-     * @param {function} asyncFunction - La función asíncrona a ejecutar (ej. una llamada a una API).
-     */
     const execute = useCallback(async (asyncFunction) => {
         setIsLoading(true);
         setError(null);

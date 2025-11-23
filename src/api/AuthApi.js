@@ -1,31 +1,21 @@
-import { API_ENDPOINTS, TOKEN_KEY } from '../constants/apiConfig';
-import { handleApiResponse } from '../utils/apiHelpers';
+import { API_ENDPOINTS, TOKEN_KEY } from '../constants/apiConfig'
+import api from './api'
 
-const BASE_URL = API_ENDPOINTS.AUTH;
+const BASE_URL = API_ENDPOINTS.AUTH
 
-export const register = (registerRequest) => {
-    return fetch(`${BASE_URL}/register`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(registerRequest)
-    }).then(handleApiResponse);
-};
+export const register = async (registerRequest) => {
+  const response = await api.post(`${BASE_URL}/register`, registerRequest)
+  return response.data
+}
 
-export const authenticate = (authRequest) => {
-    return fetch(`${BASE_URL}/authenticate`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(authRequest)
-    }).then(handleApiResponse);
-};
+export const authenticate = async (authRequest) => {
+  const response = await api.post(`${BASE_URL}/authenticate`, authRequest)
+  return response.data
+}
 
 export const saveToken = (accessToken) => {
-    localStorage.setItem(TOKEN_KEY, accessToken);
-};
+  localStorage.setItem(TOKEN_KEY, accessToken)
+}
 
 export const getToken = () => {
     return localStorage.getItem(TOKEN_KEY);

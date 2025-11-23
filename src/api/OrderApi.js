@@ -1,62 +1,40 @@
-import { getAuthHeaders, handleApiResponse } from '../utils/apiHelpers';
-import { API_ENDPOINTS } from '../constants/apiConfig';
+import { getAuthHeaders } from '../utils/apiHelpers'
+import { API_ENDPOINTS } from '../constants/apiConfig'
+import api from './api'
 
-const BASE_URL = API_ENDPOINTS.ORDERS;
+const BASE_URL = API_ENDPOINTS.ORDERS
 
-export const getMyOrders = () => {
-    return fetch(`${BASE_URL}/me`, {
-        method: 'GET',
-        headers: getAuthHeaders()
-    })
-    .then(handleApiResponse);
-};
+export const getMyOrders = async () => {
+  const response = await api.get(`${BASE_URL}/me`, { headers: getAuthHeaders() })
+  return response.data
+}
 
-export const getMyOrderById = (orderId) => {
-    return fetch(`${BASE_URL}/me/${orderId}`, {
-        method: 'GET',
-        headers: getAuthHeaders()
-    })
-    .then(handleApiResponse);
-};
+export const getMyOrderById = async (orderId) => {
+  const response = await api.get(`${BASE_URL}/me/${orderId}`, { headers: getAuthHeaders() })
+  return response.data
+}
 
-export const createOrder = (orderRequest) => {
-    return fetch(`${BASE_URL}`, {
-        method: 'POST',
-        headers: getAuthHeaders(),
-        body: JSON.stringify(orderRequest)
-    })
-    .then(handleApiResponse);
-};
+export const createOrder = async (orderRequest) => {
+  const response = await api.post(`${BASE_URL}`, orderRequest, { headers: getAuthHeaders() })
+  return response.data
+}
 
-export const updateMyOrder = (orderId, orderRequest) => {
-    return fetch(`${BASE_URL}/me/${orderId}`, {
-        method: 'PUT',
-        headers: getAuthHeaders(),
-        body: JSON.stringify(orderRequest)
-    })
-    .then(handleApiResponse);
-};
+export const updateMyOrder = async (orderId, orderRequest) => {
+  const response = await api.put(`${BASE_URL}/me/${orderId}`, orderRequest, { headers: getAuthHeaders() })
+  return response.data
+}
 
-export const getAllOrders = () => {
-    return fetch(`${BASE_URL}/admin`, {
-        method: 'GET',
-        headers: getAuthHeaders()
-    })
-    .then(handleApiResponse);
-};
+export const getAllOrders = async () => {
+  const response = await api.get(`${BASE_URL}/admin`, { headers: getAuthHeaders() })
+  return response.data
+}
 
-export const getOrdersByUserId = (userId) => {
-    return fetch(`${BASE_URL}/admin/${userId}`, {
-        method: 'GET',
-        headers: getAuthHeaders()
-    })
-    .then(handleApiResponse);
-};
+export const getOrdersByUserId = async (userId) => {
+  const response = await api.get(`${BASE_URL}/admin/${userId}`, { headers: getAuthHeaders() })
+  return response.data
+}
 
-export const getOrderByUserIdAndOrderId = (userId, orderId) => {
-    return fetch(`${BASE_URL}/admin/${userId}/${orderId}`, {
-        method: 'GET',
-        headers: getAuthHeaders()
-    })
-    .then(handleApiResponse);
-};
+export const getOrderByUserIdAndOrderId = async (userId, orderId) => {
+  const response = await api.get(`${BASE_URL}/admin/${userId}/${orderId}`, { headers: getAuthHeaders() })
+  return response.data
+}

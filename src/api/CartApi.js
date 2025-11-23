@@ -1,46 +1,30 @@
-import { getAuthHeaders, handleApiResponse } from '../utils/apiHelpers';
-import { API_ENDPOINTS } from '../constants/apiConfig';
+import { getAuthHeaders } from '../utils/apiHelpers'
+import { API_ENDPOINTS } from '../constants/apiConfig'
+import api from './api'
 
-const BASE_URL = API_ENDPOINTS.CART;
+const BASE_URL = API_ENDPOINTS.CART
 
-export const viewCart = () => {
-    return fetch(`${BASE_URL}`, {
-        method: 'GET',
-        headers: getAuthHeaders()
-    })
-    .then(handleApiResponse);
-};
+export const viewCart = async () => {
+  const response = await api.get(`${BASE_URL}`, { headers: getAuthHeaders() })
+  return response.data
+}
 
-export const addToCart = (productId, quantity) => {
-    return fetch(`${BASE_URL}`, {
-        method: 'POST',
-        headers: getAuthHeaders(),
-        body: JSON.stringify({ productId, quantity })
-    })
-    .then(handleApiResponse);
-};
+export const addToCart = async (productId, quantity) => {
+  const response = await api.post(`${BASE_URL}`, { productId, quantity }, { headers: getAuthHeaders() })
+  return response.data
+}
 
-export const updateCart = (productId, quantity) => {
-    return fetch(`${BASE_URL}`, {
-        method: 'PUT',
-        headers: getAuthHeaders(),
-        body: JSON.stringify({ productId, quantity })
-    })
-    .then(handleApiResponse);
-};
+export const updateCart = async (productId, quantity) => {
+  const response = await api.put(`${BASE_URL}`, { productId, quantity }, { headers: getAuthHeaders() })
+  return response.data
+}
 
-export const clearCart = () => {
-    return fetch(`${BASE_URL}`, {
-        method: 'DELETE',
-        headers: getAuthHeaders()
-    })
-    .then(handleApiResponse);
-};
+export const clearCart = async () => {
+  const response = await api.delete(`${BASE_URL}`, { headers: getAuthHeaders() })
+  return response.data
+}
 
-export const removeFromCart = (productId) => {
-    return fetch(`${BASE_URL}/${productId}`, {
-        method: 'DELETE',
-        headers: getAuthHeaders()
-    })
-    .then(handleApiResponse);
-};
+export const removeFromCart = async (productId) => {
+  const response = await api.delete(`${BASE_URL}/${productId}`, { headers: getAuthHeaders() })
+  return response.data
+}

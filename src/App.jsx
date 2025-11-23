@@ -3,7 +3,7 @@ import Footer from "./components/footer/Footer.jsx";
 import Home from "./views/Home.jsx";
 import Category from "./views/Category.jsx";
 import Sale from "./views/Sale.jsx";
-import Cart from "./views/Cart.jsx";
+import Cart from "./views/user/Cart.jsx";
 import ProductDetail from "./views/ProductDetail.jsx";
 import Contacto from "./views/Contacto.jsx";
 import Terminos from "./views/Terminos.jsx";
@@ -41,22 +41,8 @@ function App() {
                     <Route path="/terminos" element={<Terminos />} />
                     <Route path="/search" element={<Search />} />
 
-                    <Route 
-                        path="/login" 
-                        element={
-                            <GuestRoute>
-                                <Login />
-                            </GuestRoute>
-                        } 
-                    />
-                    <Route 
-                        path="/register" 
-                        element={
-                            <GuestRoute>
-                                <Register />
-                            </GuestRoute>
-                        } 
-                    />
+                    <Route path="/login" element={<GuestRoute><Login /></GuestRoute>} />
+                    <Route path="/register" element={<GuestRoute><Register /></GuestRoute>} />
 
                     <Route 
                         path="/cart" 

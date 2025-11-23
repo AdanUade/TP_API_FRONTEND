@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { getProductById } from '../api/ProductApi';
-import { calculateFinalPrice } from '../utils/productHelpers';
+import { calculateFinalPrice, isProductOutOfStock, isProductOnSale } from '../utils/productHelpers';
 
 export const useProductData = (productId) => {
     const [product, setProduct] = useState(null);
@@ -30,8 +30,8 @@ export const useProductData = (productId) => {
         if (!product) return null;
         
         return {
-            isOutOfStock: product.stock === 0,
-            onSale: product.discount < 1,
+            isOutOfStock: isProductOutOfStock(product),
+            onSale: isProductOnSale(product),
             finalPrice: calculateFinalPrice(product.price, product.discount),
             oldPrice: product.price
         };

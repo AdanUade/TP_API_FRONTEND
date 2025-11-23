@@ -1,6 +1,7 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { useProductData } from '../../hooks/useProductData';
 import { buildRoute } from '../../constants/routes';
+import { isProductOutOfStock, isProductOnSale, calculateFinalPrice, getDiscountPercentage } from '../../utils/productHelpers';
 import PageTitle from '../../components/page/PageTitle';
 import Button from '../../components/generico/Button';
 import ErrorGenerico from '../../components/generico/ErrorGenerico';
@@ -17,7 +18,7 @@ const ProductDetailSeller = () => {
     const { productId } = useParams();
     const navigate = useNavigate();
     
-    const { product, productInfo, isLoading, error } = useProductData(productId);
+    const { product, isLoading, error } = useProductData(productId);
 
     const handleEdit = () => {
         navigate(buildRoute.sellerProductEdit(product.id));
@@ -56,7 +57,11 @@ const ProductDetailSeller = () => {
         );
     }
 
-    const { isOutOfStock, onSale, finalPrice, oldPrice } = productInfo;
+    // Se calcula la información derivada del producto usando los helpers
+    const onSale = isProductOnSale(product);
+    const isOutOfStock = isProductOutOfStock(product);
+    const finalPrice = calculateFinalPrice(product.price, product.discount);
+    const oldPrice = product.price;
     
     return (
         <div>
@@ -87,7 +92,6 @@ const ProductDetailSeller = () => {
                         onSale={onSale}
                     />
 
-                    {/* Panel de gestión para vendedores */}
                     <div className="border-t-2 border-black pt-4 mt-4">
                         <h3 className="text-xl font-bold mb-4">Panel de Gestión</h3>
                         
@@ -102,11 +106,11 @@ const ProductDetailSeller = () => {
                                 <span className="font-semibold">Categoría:</span>
                                 <span>{product.category || 'Sin categoría'}</span>
                             </p>
-                            {product.discount < 1 && (
+                            {onSale && (
                                 <p className="flex justify-between">
                                     <span className="font-semibold">Descuento:</span>
                                     <span className="text-green-600">
-                                        {((1 - product.discount) * 100).toFixed(0)}% OFF
+                                        {getDiscountPercentage(product.discount)}% OFF
                                     </span>
                                 </p>
                             )}

@@ -9,13 +9,12 @@ const ProtectedRoute = ({
   allowedRoles = [],
   deniedRoles = [],
   redirectTo,
-  fallback = null
 }) => {
   const { user, isAuthenticated, hasRole, isLoading } = useAuth();
   const location = useLocation();
 
   if (isLoading) {
-    return fallback || <LoadingSpinner />;
+    return <LoadingSpinner />;
   }
 
   // Caso 1: Ruta requiere autenticación pero el usuario no está autenticado
@@ -77,7 +76,6 @@ export const GuestRoute = ({ children, ...props }) => (
   <ProtectedRoute 
     requireAuth={false} 
     deniedRoles={['ADMIN', 'SELLER', 'USER']}
-    {...props}
   >
     {children}
   </ProtectedRoute>

@@ -10,8 +10,8 @@ import {
 const CartContext = createContext();
 
 export const useCart = () => {
-return useContext(CartContext);
-};
+    return useContext(CartContext);
+    };
 
 export const CartProvider = ({ children }) => {
 const { user } = useUser();
@@ -104,29 +104,28 @@ const syncWithBackend = (action, productId, quantity) => {
     }
 };
 
-useEffect(() => {
-    if (user) {
-        if (user.rol === 'SELLER' || user.rol === 'ADMIN') {
-            setCartItems([]); // Asegurar que esté vacío
-            return;
-        }
-
-        setCartItems(prevItems => {
-            if (prevItems.length > 0) {
-                syncGuestCartToServer(prevItems);
-            } else {
-                loadCartFromServer();
+    useEffect(() => {
+        if (user) {
+            if (user.rol === 'SELLER' || user.rol === 'ADMIN') {
+                setCartItems([]); // Asegurar que esté vacío
+                return;
             }
-            return prevItems; // No modificar el estado aquí
-        });
-    } else {
-        setCartItems([]);
-    }
-}, [user]); // Solo depende de user para evitar loops infinitos
+
+            setCartItems(prevItems => {
+                if (prevItems.length > 0) {
+                    syncGuestCartToServer(prevItems);
+                } else {
+                    loadCartFromServer();
+                }
+                return prevItems; // No modificar el estado aquí
+            });
+        } else {
+            setCartItems([]);
+        }
+    }, [user]); // Solo depende de user para evitar loops infinitos
 
 const addToCart = (productToAdd, image, quantityToAdd = 1) => {
     if (user && (user.rol === 'SELLER' || user.rol === 'ADMIN')) {
-        console.warn('🚫 Vendedores y administradores no pueden agregar productos al carrito');
         return;
     }
     
