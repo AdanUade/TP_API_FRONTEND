@@ -1,10 +1,11 @@
-import { useCart } from '../../context/CartContext';
+import { useDispatch } from 'react-redux';
+import { updateQuantity, removeFromCart } from '../../store/cartSlice';
 import {QuantitySelector, PriceDisplay, Button} from '../generico'
 import CardImage from '../products/productCard/CardImage';
 import { formatPrice,calculateItemPrice, calculateItemSubtotal } from '../../utils';
 
 const CartItem = ({ item, image }) => {
-    const { updateQuantity, removeFromCart } = useCart();
+    const dispatch = useDispatch();
     const onSale = item.discount < 1;
     const finalPrice = calculateItemPrice(item);
     const subtotal = calculateItemSubtotal(item);
@@ -47,13 +48,13 @@ const CartItem = ({ item, image }) => {
         <div className="flex items-center justify-between w-full sm:w-auto gap-4 sm:gap-6">
             <QuantitySelector
                 quantity={item.quantity}
-                onDecrease={() => updateQuantity(item.id, item.quantity - 1)}
-                onIncrease={() => updateQuantity(item.id, item.quantity + 1)}
+                onDecrease={() => dispatch(updateQuantity(item.id, item.quantity - 1))}
+                onIncrease={() => dispatch(updateQuantity(item.id, item.quantity + 1))}
             />
             <div className="flex items-center gap-4">
                 <p className="text-2xl font-bold w-24 text-right">{formatPrice(subtotal)}</p>
                 <Button 
-                    onClick={() => removeFromCart(item.id)} 
+                    onClick={() => dispatch(removeFromCart(item.id))}
                     variant="danger"
                     className="!w-10 !h-10 !p-2 rounded-full !text-xl flex items-center justify-center cursor-pointer"
                 >

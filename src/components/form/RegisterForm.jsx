@@ -1,7 +1,8 @@
 import { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { register, saveToken } from '../../api/AuthApi';
-import { useUser } from '../../context/UserContext';
+import { useDispatch } from 'react-redux';
+import { refreshUser } from '../../store/userSlice';
 import { useAsync } from '../../hooks/useAsync';
 import { useForm } from '../../hooks/useForm';
 import { isValidEmail, isValidPassword } from '../../utils/validators';
@@ -14,7 +15,7 @@ const MIN_NAME_LENGTH = 3;
 
 const RegisterForm = () => {
     const navigate = useNavigate();
-    const { refreshUser } = useUser();
+    const dispatch = useDispatch();
     const { isLoading, error, execute } = useAsync();
 
     const validationRules = useMemo(() => ({
@@ -34,7 +35,7 @@ const RegisterForm = () => {
             });
 
             saveToken(response.access_token);
-            await refreshUser();
+            await dispatch(refreshUser());
             navigate('/', { replace: true });
         });
     };

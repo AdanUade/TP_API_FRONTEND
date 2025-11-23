@@ -1,8 +1,13 @@
-import { useUser } from '../context/UserContext';
 import { USER_ROLES } from '../constants/userRoles';
+import { useSelector, useDispatch } from 'react-redux';
+import { logoutUser, refreshUser as refreshUserAction } from '../store/userSlice';
 
 export const useAuth = () => {
-    const { user, isLoading, logout, refreshUser } = useUser();
+    const dispatch = useDispatch();
+    const { user, isLoading } = useSelector(state => state.user);
+
+    const logout = () => dispatch(logoutUser());
+    const refreshUser = () => dispatch(refreshUserAction());
 
     const isAuthenticated = !!user;
 

@@ -1,7 +1,8 @@
 import { useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { authenticate, saveToken } from '../../api';
-import { useUser } from '../../context/UserContext';
+import { useDispatch } from 'react-redux';
+import { refreshUser } from '../../store/userSlice';
 import { useAsync, useForm } from '../../hooks';
 import { isValidEmail, isNotEmpty } from '../../utils';
 import { Button, ErrorGenerico as ErrorForm } from '../generico';
@@ -10,7 +11,7 @@ import FormField from './FormField';
 const LoginForm = () => {
     const navigate = useNavigate();
     const location = useLocation();
-    const { refreshUser } = useUser();
+    const dispatch = useDispatch();
     const { isLoading, error, execute } = useAsync();
     
     const from = location.state?.from || '/';
@@ -24,7 +25,7 @@ const LoginForm = () => {
         await execute(async () => {
             const response = await authenticate(formValues);
             saveToken(response.access_token);
-            await refreshUser();
+            await dispatch(refreshUser());
             navigate(from, { replace: true });
         });
     };

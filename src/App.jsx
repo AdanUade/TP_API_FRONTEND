@@ -25,9 +25,68 @@ import EditProduct from "./views/seller/EditProduct.jsx";
 
 import { Routes, Route } from "react-router-dom";
 import { ProtectedRoute, AdminRoute, SellerRoute, AuthenticatedRoute, GuestRoute } from "./components/routing";
-
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { refreshUser } from "./store/userSlice";
+import { loadCartFromServer, syncGuestCartToServer, setCartItems } from "./store/cartSlice";
 
 function App() {
+    const dispatch = useDispatch();
+    const { user } = useSelector(state => state.user);
+    const { items: cartItems } = useSelector(state => state.cart);
+
+    useEffect(() => {
+        dispatch(refreshUser());
+    }, [dispatch]);
+
+    useEffect(() => {
+        if (user) {
+            if (user.rol === 'SELLER' || user.rol === 'ADMIN') {
+                dispatch(setCartItems([]));
+                return;
+            }
+
+            if (cartItems.length > 0) {
+                 // If we have items and just logged in (or user changed), try to sync
+                 // But be careful not to sync already synced items unnecessarily if this logic runs on every render.
+                 // The original Context logic was:
+                 /*
+                  setCartItems(prevItems => {
+                    if (prevItems.length > 0) {
+                         syncGuestCartToServer(prevItems);
+                    } else {
+                         loadCartFromServer();
+                    }
+                     return prevItems;
+                  });
+                 */
+                 // In Redux, we need to decide.
+                 // If we just loaded the user, and we have items in "guest" cart (which is now in Redux store), sync them.
+                 // We can check if we need to sync.
+
+                 // However, calling syncGuestCartToServer triggers API calls.
+                 // We should probably rely on a flag or just do it once when user becomes available.
+
+                 // For now, mirroring the Context logic:
+                 dispatch(syncGuestCartToServer(cartItems));
+            } else {
+                dispatch(loadCartFromServer());
+            }
+        } else {
+             // User logged out or not present
+             // In context: setCartItems([])
+             // But if we want to keep guest cart persistence across refreshes we might want to keep it?
+             // Context implementation:
+             /*
+                } else {
+                    setCartItems([]);
+                }
+             */
+             // So it clears cart on logout.
+             dispatch(setCartItems([]));
+        }
+    }, [user, dispatch]); // Removed cartItems from dependency to avoid loop if sync updates cartItems
+
     return (
         <div className="flex flex-col min-h-screen">
             <Header />

@@ -1,20 +1,21 @@
 import { useNavigate } from 'react-router-dom';
-import { useCart } from '../../context/CartContext';
+import { useSelector } from 'react-redux';
+import { useMemo } from 'react';
 import { useAuth } from '../../hooks/useAuth';
 import PageTitle from '../../components/page/PageTitle';
 import CartItem from '../../components/cart/CartItem';
 import Button from '../../components/generico/Button';
 import ErrorGenerico from '../../components/generico/ErrorGenerico';
 import { formatPrice } from '../../utils/formatters';
-import { calculateTotalSavings } from '../../utils/cartHelpers';
+import { calculateTotalSavings, calculateCartTotal } from '../../utils/cartHelpers';
 
 const Cart = () => {
     const navigate = useNavigate();
     const { isAuthenticated } = useAuth();
-    const { cartItems, cartTotal } = useCart();
-    const totalDiscount = calculateTotalSavings(cartItems);
+    const { items: cartItems } = useSelector(state => state.cart);
 
-    console.log('Cart Items:', cartItems);
+    const totalDiscount = useMemo(() => calculateTotalSavings(cartItems), [cartItems]);
+    const cartTotal = useMemo(() => calculateCartTotal(cartItems), [cartItems]);
 
     const handleCheckout = () => {
         if (!isAuthenticated) {

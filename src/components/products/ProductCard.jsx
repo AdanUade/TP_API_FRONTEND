@@ -2,11 +2,12 @@ import { Link } from 'react-router-dom';
 import CardImage from './productCard/CardImage';
 import CardPrice from './productCard/CardPrice';
 import Button from '../generico/Button';
-import { useCart } from '../../context/CartContext.jsx';
+import { useDispatch } from 'react-redux';
+import { addToCart } from '../../store/cartSlice';
 import { isProductOnSale, isProductOutOfStock, calculateFinalPrice } from '../../utils/productHelpers';
 
 const ProductCard = ({ product }) => {
-    const { addToCart } = useCart();
+    const dispatch = useDispatch();
     const onSale = isProductOnSale(product);
     const outOfStock = isProductOutOfStock(product);
     const finalPrice = calculateFinalPrice(product.price, product.discount);
@@ -32,7 +33,7 @@ return(
             onSale={onSale}
             />
 
-            <Button onClick={() => addToCart(product, product.imageFile)} disabled={outOfStock}>
+            <Button onClick={() => dispatch(addToCart({product, image: product.imageFile}))} disabled={outOfStock}>
                 {outOfStock ? 'Agotado' : '¡Añadir al Carrito!'}
             </Button>
         </div>

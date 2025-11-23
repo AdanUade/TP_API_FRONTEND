@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useCart } from '../context/CartContext';
+import { useDispatch } from 'react-redux';
+import { addToCart } from '../store/cartSlice';
 import { useProductData } from '../hooks/useProductData';
 import PageTitle from '../components/page/PageTitle';
 import Button from '../components/generico/Button';
@@ -17,7 +18,7 @@ import ProductActions from '../components/products/productDetail/ProductActions'
 const ProductDetailUser = () => {
     const { productId } = useParams();
     const navigate = useNavigate();
-    const { addToCart } = useCart();
+    const dispatch = useDispatch();
     
     const [quantity, setQuantity] = useState(1);
     
@@ -25,9 +26,9 @@ const ProductDetailUser = () => {
 
     const handleAddToCart = useCallback(() => {
         if (product) {
-            addToCart(product, product.file, quantity);
+            dispatch(addToCart({product, image: product.file, quantity}));
         }
-    }, [addToCart, product, quantity]);
+    }, [dispatch, product, quantity]);
 
     const handleQuantityChange = useCallback((newQuantity) => {
         setQuantity(Math.max(1, Math.min(newQuantity, product?.stock || 1)));

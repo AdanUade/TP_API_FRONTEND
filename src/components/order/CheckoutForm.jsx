@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createOrder } from '../../api';
-import { useUser } from '../../context/UserContext';
-import { useCart } from '../../context/CartContext';
+import { useSelector, useDispatch } from 'react-redux';
+import { clearCart } from '../../store/cartSlice';
 import { useCheckoutValidation } from '../../hooks';
 import ShippingForm from './ShippingForm';
 import PaymentForm from './PaymentForm';
@@ -10,8 +10,8 @@ import Button from '../generico/Button';
 import ErrorGenerico from '../generico/ErrorGenerico';
 
 const CheckoutForm = () => {
-    const { user } = useUser();
-    const { clearCart } = useCart();
+    const { user } = useSelector(state => state.user);
+    const dispatch = useDispatch();
     const navigate = useNavigate();
     
     const [formData, setFormData] = useState({
@@ -58,7 +58,7 @@ const CheckoutForm = () => {
             .then((order) => {
                 console.log('✅ Orden creada exitosamente:', order);
                 // Limpiar el carrito local (el backend ya lo limpió en el servidor)
-                clearCart();
+                dispatch(clearCart());
                 // Redirigir a la página de órdenes con mensaje de éxito
                 navigate('/perfil/orders', { 
                     state: { 

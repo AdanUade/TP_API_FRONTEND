@@ -1,10 +1,10 @@
 import Button from '../generico/Button';
-import { useUser } from "../../context/UserContext.jsx";
+import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth.js';
 
 const CardUser = () => {
-    const { user } = useUser();
+    const { user } = useSelector(state => state.user);
     const { isUser } = useAuth();
     const navigate = useNavigate();
 

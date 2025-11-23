@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { getProductsOnSale } from '../api/ProductApi';
-import { useCart } from '../context/CartContext';
+import { useDispatch } from 'react-redux';
+import { addToCart } from '../store/cartSlice.js';
 import { useAsync } from '../hooks/useAsync.js';
 
 import PageTitle from '../components/page/PageTitle';
@@ -11,7 +12,8 @@ import Pagination from '../components/page/Pagination';
 import ErrorForm from '../components/generico/ErrorGenerico';
 
 const Sale = () => {
-    const { addToCart } = useCart();
+    const dispatch = useDispatch();
+    const handleAddToCart = (product, image) => dispatch(addToCart({product, image}));
     const [searchParams, setSearchParams] = useSearchParams();
     const { isLoading, error, data: productsData, execute } = useAsync();
 
@@ -62,7 +64,7 @@ const Sale = () => {
             <ProductGrid 
                 products={products} 
                 isLoading={isLoading} 
-                onAddToCart={addToCart}
+                onAddToCart={handleAddToCart}
             />
             
             {!isLoading && (

@@ -1,7 +1,8 @@
 import { getProductsByCategory } from '../api/ProductApi';
-import { useCart } from '../context/CartContext';
 import { useParams } from 'react-router-dom';
 import { CATEGORY_INFO } from '../constants/productCategories';
+import { useDispatch } from 'react-redux';
+import { addToCart } from '../store/cartSlice.js';
 
 import PageTitle from '../components/page/PageTitle';
 import ProductFilters from '../components/products/ProductFilters';
@@ -25,7 +26,8 @@ const Category = ({ category: categoryProp, title: titleProp, subtitle: subtitle
     const title = titleProp || config.title || 'Productos';
     const subtitle = subtitleProp || config.subtitle || 'Descubre nuestros productos';
     
-    const { addToCart } = useCart();
+    const dispatch = useDispatch();
+    const handleAddToCart = (product, image) => dispatch(addToCart({product, image}));
     
     // Hook de paginación
     const { currentPage, handlePageChange, resetPage } = usePagination();
@@ -81,7 +83,7 @@ const Category = ({ category: categoryProp, title: titleProp, subtitle: subtitle
             <ProductGrid 
                 products={products} 
                 isLoading={isLoading}
-                onAddToCart={addToCart} 
+                onAddToCart={handleAddToCart}
             />
             
             {!isLoading && (

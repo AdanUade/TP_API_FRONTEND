@@ -1,14 +1,16 @@
 import { Link, useNavigate } from 'react-router-dom';
 import UserIcon from '../../assets/icons/user-icon.svg?react';
 import Button from '../generico/Button';
-import { useUser } from '../../context/UserContext';
+import { useSelector, useDispatch } from 'react-redux';
+import { logoutUser } from '../../store/userSlice';
 
 const UserAuth = () => {
-  const { user, logout } = useUser();
+  const { user } = useSelector(state => state.user);
+  const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    logout();
+    dispatch(logoutUser());
     navigate('/');
   };
 

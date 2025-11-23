@@ -1,7 +1,8 @@
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { updateUserMe } from '../../api/UserApi';
-import { useUser } from '../../context/UserContext';
+import { useSelector, useDispatch } from 'react-redux';
+import { refreshUser } from '../../store/userSlice';
 import { useAsync } from '../../hooks/useAsync';
 import { useForm } from '../../hooks/useForm';
 import { isValidEmail } from '../../utils/validators';
@@ -12,7 +13,8 @@ import ErrorGenerico from '../generico/ErrorGenerico';
 const MIN_NAME_LENGTH = 3;
 
 const PerfilEditForm = () => {
-    const { user, refreshUser } = useUser();
+    const dispatch = useDispatch();
+    const { user } = useSelector(state => state.user);
     const navigate = useNavigate();
     const { isLoading, error, execute } = useAsync();
     const [success, setSuccess] = useState(false);
@@ -33,7 +35,7 @@ const PerfilEditForm = () => {
             }
 
             await updateUserMe(updatedData);
-            await refreshUser();
+            await dispatch(refreshUser());
             
             setSuccess(true);
             setTimeout(() => {

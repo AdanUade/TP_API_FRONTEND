@@ -1,8 +1,13 @@
 import CartIcon from '../../assets/icons/cart-icon.svg?react';
 import { Link } from 'react-router-dom';
-import { useCart } from '../../context/CartContext.jsx';
+import { useSelector } from 'react-redux';
+import { useMemo } from 'react';
+import { calculateTotalItems } from '../../utils/cartHelpers.js';
+
 const CartHeader = () => {
-const { totalItemCount } = useCart();
+const { items } = useSelector(state => state.cart);
+const totalItemCount = useMemo(() => calculateTotalItems(items), [items]);
+
 return (
     <Link to="/cart" className="relative cursor-pointer group">
         <CartIcon className="w-8 h-8 fill-white group-hover:fill-yellow-400 transition-colors" />
