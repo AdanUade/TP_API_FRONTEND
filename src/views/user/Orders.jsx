@@ -1,15 +1,16 @@
 import PageTitle from "../../components/page/PageTitle";
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
-import { getMyOrders } from "../../api/OrderApi";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchMyOrders } from "../../store/orderSlice";
 import ErrorGenerico from "../../components/generico/ErrorGenerico";
 import LoadingSpinner from "../../components/generico/LoadingSpinner";
 import ItemOrder from "../../components/order/ItemOrder";
-import { useAsync } from "../../hooks/useAsync.js";
 
 const Orders = () => {
     const location = useLocation();
-    const { isLoading, error, data: orders, execute } = useAsync();
+    const dispatch = useDispatch();
+    const { items: orderList, isLoading, error } = useSelector(state => state.orders);
     const [showSuccess, setShowSuccess] = useState(false);
 
     useEffect(() => {
@@ -20,10 +21,8 @@ const Orders = () => {
             setTimeout(() => setShowSuccess(false), 5000);
         }
 
-        execute(() => getMyOrders());
-    }, [location, execute]);
-
-    const orderList = orders || [];
+        dispatch(fetchMyOrders());
+    }, [location, dispatch]);
 
     return (
         <>

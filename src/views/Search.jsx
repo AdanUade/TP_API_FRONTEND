@@ -1,24 +1,25 @@
 import { useEffect, useState } from "react"
 import { useSearchParams } from "react-router-dom"
-import { searchProducts } from "../api/ProductApi"
+import { useDispatch, useSelector } from "react-redux"
+import { searchProducts } from "../store/productSlice"
 import PageTitle from "../components/page/PageTitle"
 import ErrorGenerico from "../components/generico/ErrorGenerico"
 import ProductGrid from "../components/products/ProductGrid"
 import LoadingSpinner from "../components/generico/LoadingSpinner"
 import Pagination from "../components/page/Pagination"
-import { useAsync } from "../hooks/useAsync.js"
 
 const Search = () => {
+    const dispatch = useDispatch();
     const [searchParams] = useSearchParams();
     const query = searchParams.get("query");
     const [currentPage, setCurrentPage] = useState(0);
-    const { isLoading, error, data: productsData, execute } = useAsync();
+    const { items: products, isLoading, error, totalPages, totalElements } = useSelector(state => state.products);
 
     useEffect(() => {
         if (query && query.trim()) {
-            execute(() => searchProducts(query, currentPage, 8));
+            dispatch(searchProducts({ query, page: currentPage, size: 8 }));
         }
-    }, [query, currentPage, execute]);
+    }, [dispatch, query, currentPage]);
 
     useEffect(() => {
         setCurrentPage(0);
@@ -60,8 +61,7 @@ const Search = () => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
-    const results = productsData || { content: [], totalPages: 0 };
-    const totalResults = results.totalElements || results.content?.length || 0;
+    const totalResults = totalElements || products.length || 0;
 
     return (
         <div>
@@ -69,7 +69,7 @@ const Search = () => {
                 title={`Resultados para "${query}"`} 
                 subtitle={`${totalResults} ${totalResults === 1 ? 'producto encontrado' : 'productos encontrados'}`}
             />
-            {results.content?.length === 0 ? (
+            {products.length === 0 ? (
                 <ErrorGenerico 
                     title="Sin resultados"
                     message={`No se encontraron productos para "${query}". Intenta con otros términos.`}
@@ -77,11 +77,11 @@ const Search = () => {
                 />
             ) : (
                 <>
-                    <ProductGrid products={results.content} isLoading={false} />
-                    {results.totalPages > 1 && (
+                    <ProductGrid products={products} isLoading={false} />
+                    {totalPages > 1 && (
                         <Pagination
                             currentPage={currentPage}
-                            totalPages={results.totalPages}
+                            totalPages={totalPages}
                             onPageChange={handlePageChange}
                         />
                     )}

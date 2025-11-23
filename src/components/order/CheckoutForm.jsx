@@ -1,8 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { createOrder } from '../../api';
 import { useSelector, useDispatch } from 'react-redux';
 import { clearCart } from '../../store/cartSlice';
+import { createNewOrder, resetOrderSuccess, clearOrderError } from '../../store/orderSlice';
 import { useCheckoutValidation } from '../../hooks';
 import ShippingForm from './ShippingForm';
 import PaymentForm from './PaymentForm';
@@ -11,6 +11,7 @@ import ErrorGenerico from '../generico/ErrorGenerico';
 
 const CheckoutForm = () => {
     const { user } = useSelector(state => state.user);
+    const { isLoading, error: orderError, success, currentOrder } = useSelector(state => state.orders);
     const dispatch = useDispatch();
     const navigate = useNavigate();
     
@@ -23,10 +24,36 @@ const CheckoutForm = () => {
         cvv: '123'
     });
     
-    const [isLoading, setIsLoading] = useState(false);
-    
     // Hook de validación personalizado
-    const { error, setError, validateForm, clearError } = useCheckoutValidation();
+    const { error: validationError, setError, validateForm, clearError } = useCheckoutValidation();
+
+    // Reset success/error state on mount
+    useEffect(() => {
+        dispatch(resetOrderSuccess());
+        dispatch(clearOrderError());
+    }, [dispatch]);
+
+    // Handle success
+    useEffect(() => {
+        if (success && currentOrder) {
+             console.log('✅ Orden creada exitosamente:', currentOrder);
+             dispatch(clearCart());
+             navigate('/perfil/orders', {
+                 state: {
+                     orderSuccess: true,
+                     orderId: currentOrder.id
+                 }
+             });
+        }
+    }, [success, currentOrder, dispatch, navigate]);
+
+    // Handle API errors
+    useEffect(() => {
+        if (orderError) {
+             console.error('❌ Error al crear orden:', orderError);
+             setError(typeof orderError === 'string' ? orderError : 'Error al procesar el pago. Intenta de nuevo.');
+        }
+    }, [orderError, setError]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -35,18 +62,18 @@ const CheckoutForm = () => {
             [name]: value
         }));
         // Limpiar error al escribir
-        if (error) clearError();
+        if (validationError) clearError();
+        if (orderError) dispatch(clearOrderError());
     };
 
     const handleSubmit = (e) => {
         e.preventDefault();
         clearError();
+        dispatch(clearOrderError());
 
         if (!validateForm(formData)) {
             return;
         }
-
-        setIsLoading(true);
 
         // Crear orden con estado PAID (pagada)
         const orderRequest = {
@@ -54,26 +81,7 @@ const CheckoutForm = () => {
             status: 'PAID'
         };
 
-        createOrder(orderRequest)
-            .then((order) => {
-                console.log('✅ Orden creada exitosamente:', order);
-                // Limpiar el carrito local (el backend ya lo limpió en el servidor)
-                dispatch(clearCart());
-                // Redirigir a la página de órdenes con mensaje de éxito
-                navigate('/perfil/orders', { 
-                    state: { 
-                        orderSuccess: true,
-                        orderId: order.id 
-                    } 
-                });
-            })
-            .catch(err => {
-                console.error('❌ Error al crear orden:', err);
-                setError(err.message || 'Error al procesar el pago. Intenta de nuevo.');
-            })
-            .finally(() => {
-                setIsLoading(false);
-            });
+        dispatch(createNewOrder(orderRequest));
     };
 
     const handleCancel = () => {
@@ -86,7 +94,7 @@ const CheckoutForm = () => {
                 Información de Envío y Pago
             </h3>
 
-            {error && <ErrorGenerico message={error} />}
+            {(validationError || orderError) && <ErrorGenerico message={validationError || (typeof orderError === 'string' ? orderError : 'Error en la orden')} />}
 
             <form onSubmit={handleSubmit} className="space-y-6">
                 <ShippingForm 

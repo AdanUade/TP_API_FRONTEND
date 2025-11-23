@@ -1,9 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { getProductsOnSale } from '../api/ProductApi';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { addToCart } from '../store/cartSlice.js';
-import { useAsync } from '../hooks/useAsync.js';
+import { fetchProductsOnSale } from '../store/productSlice.js';
 
 import PageTitle from '../components/page/PageTitle';
 import ProductFilters from '../components/products/ProductFilters';
@@ -15,22 +14,17 @@ const Sale = () => {
     const dispatch = useDispatch();
     const handleAddToCart = (product, image) => dispatch(addToCart({product, image}));
     const [searchParams, setSearchParams] = useSearchParams();
-    const { isLoading, error, data: productsData, execute } = useAsync();
+    const { items: products, isLoading, error, totalPages } = useSelector(state => state.products);
 
     const currentPage = parseInt(searchParams.get('page')) || 0;
     const [sortByPrice, setSortByPrice] = useState('default');
 
     useEffect(() => {
-        execute(() => 
-            getProductsOnSale({
-                page: currentPage,
-                sortByPrice: sortByPrice,
-            })
-        );
-    }, [currentPage, sortByPrice, execute]);
-
-    const products = productsData?.content || [];
-    const totalPages = productsData?.totalPages || 1;
+        dispatch(fetchProductsOnSale({
+            page: currentPage,
+            sortByPrice: sortByPrice,
+        }));
+    }, [dispatch, currentPage, sortByPrice]);
     
     const handlePageChange = (newPage) => {
         setSearchParams({ page: newPage.toString() });

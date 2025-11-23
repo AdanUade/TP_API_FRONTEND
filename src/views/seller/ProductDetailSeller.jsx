@@ -1,5 +1,7 @@
 import { useParams, useNavigate } from 'react-router-dom';
-import { useProductData } from '../../hooks/useProductData';
+import { useDispatch, useSelector } from 'react-redux';
+import { useEffect } from 'react';
+import { fetchProductById, clearSelectedProduct } from '../../store/productSlice';
 import { buildRoute } from '../../constants/routes';
 import { isProductOutOfStock, isProductOnSale, calculateFinalPrice, getDiscountPercentage } from '../../utils/productHelpers';
 import PageTitle from '../../components/page/PageTitle';
@@ -17,8 +19,16 @@ import DeleteProductButton from '../../components/generico/DeleteProductButton';
 const ProductDetailSeller = () => {
     const { productId } = useParams();
     const navigate = useNavigate();
+    const dispatch = useDispatch();
     
-    const { product, isLoading, error } = useProductData(productId);
+    const { selectedProduct: product, isLoading, error } = useSelector(state => state.products);
+
+    useEffect(() => {
+        dispatch(fetchProductById(productId));
+        return () => {
+            dispatch(clearSelectedProduct());
+        };
+    }, [dispatch, productId]);
 
     const handleEdit = () => {
         navigate(buildRoute.sellerProductEdit(product.id));

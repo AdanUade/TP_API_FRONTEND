@@ -1,8 +1,9 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { addToCart } from '../store/cartSlice';
-import { useProductData } from '../hooks/useProductData';
+import { fetchProductById, clearSelectedProduct } from '../store/productSlice';
+import { calculateFinalPrice, isProductOutOfStock, isProductOnSale } from '../utils/productHelpers';
 import PageTitle from '../components/page/PageTitle';
 import Button from '../components/generico/Button';
 import ErrorGenerico from '../components/generico/ErrorGenerico';
@@ -22,11 +23,28 @@ const ProductDetailUser = () => {
     
     const [quantity, setQuantity] = useState(1);
     
-    const { product, productInfo, isLoading, error } = useProductData(productId);
+    const { selectedProduct: product, isLoading, error } = useSelector(state => state.products);
+
+    useEffect(() => {
+        dispatch(fetchProductById(productId));
+        return () => {
+            dispatch(clearSelectedProduct());
+        };
+    }, [dispatch, productId]);
+
+    const productInfo = useMemo(() => {
+        if (!product) return null;
+        return {
+            isOutOfStock: isProductOutOfStock(product),
+            onSale: isProductOnSale(product),
+            finalPrice: calculateFinalPrice(product.price, product.discount),
+            oldPrice: product.price
+        };
+    }, [product]);
 
     const handleAddToCart = useCallback(() => {
         if (product) {
-            dispatch(addToCart({product, image: product.file, quantity}));
+            dispatch(addToCart({product, image: product.imageFile, quantity}));
         }
     }, [dispatch, product, quantity]);
 

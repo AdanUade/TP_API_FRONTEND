@@ -1,8 +1,8 @@
-import { getProductsByCategory } from '../api/ProductApi';
 import { useParams } from 'react-router-dom';
 import { CATEGORY_INFO } from '../constants/productCategories';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { addToCart } from '../store/cartSlice.js';
+import { fetchProductsByCategory } from '../store/productSlice.js';
 
 import PageTitle from '../components/page/PageTitle';
 import ProductFilters from '../components/products/ProductFilters';
@@ -13,7 +13,7 @@ import ErrorGenerico from '../components/generico/ErrorGenerico';
 // Usar hooks personalizados
 import { usePagination } from '../hooks/usePagination.js';
 import { useFilters } from '../hooks/useFilters.js';
-import { useProducts } from '../hooks/useProducts.js';
+import { useEffect } from 'react';
 
 const Category = ({ category: categoryProp, title: titleProp, subtitle: subtitleProp }) => {
     // Soporte para uso con useParams (ruta dinámica) o props directas
@@ -27,6 +27,7 @@ const Category = ({ category: categoryProp, title: titleProp, subtitle: subtitle
     const subtitle = subtitleProp || config.subtitle || 'Descubre nuestros productos';
     
     const dispatch = useDispatch();
+    const { items: products, isLoading, error, totalPages } = useSelector(state => state.products);
     const handleAddToCart = (product, image) => dispatch(addToCart({product, image}));
     
     // Hook de paginación
@@ -38,17 +39,14 @@ const Category = ({ category: categoryProp, title: titleProp, subtitle: subtitle
         onSale: false
     });
     
-    // Hook de productos
-    const { products, isLoading, error, totalPages } = useProducts({
-        fetchFunction: getProductsByCategory,
-        page: currentPage,
-        filters: { 
-            category, 
-            sortByPrice: filters.sortByPrice, 
-            onSale: filters.onSale 
-        },
-        dependencies: [category, filters.sortByPrice, filters.onSale]
-    });
+    useEffect(() => {
+        dispatch(fetchProductsByCategory({
+            page: currentPage,
+            category,
+            sortByPrice: filters.sortByPrice,
+            onSale: filters.onSale
+        }));
+    }, [dispatch, currentPage, category, filters.sortByPrice, filters.onSale]);
 
     const handleSortChange = (newSortOrder) => {
         updateFilter('sortByPrice', newSortOrder);
