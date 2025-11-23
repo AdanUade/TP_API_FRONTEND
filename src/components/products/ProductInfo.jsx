@@ -1,6 +1,6 @@
 import { PriceDisplay, StockStatus } from '../common';
 
-const ProductInfo = ({ product, finalPrice, oldPrice, discount, isOutOfStock, onSale }) => {
+const ProductInfo = ({ product, finalPrice, oldPrice, discount }) => {
     return (
         <div className="flex flex-col gap-4">
             <h2 className="text-4xl lg:text-5xl font-extrabold uppercase">

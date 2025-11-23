@@ -35,7 +35,7 @@ const ProductDetailSeller = () => {
     };
 
     // callback que recibe DeleteProductButton cuando la eliminación fue exitosa
-    const handleDeleted = (deletedId) => {
+    const handleDeleted = () => {
         // por ahora, volvemos al listado de stock de vendedor
         navigate('/seller/stock');
     };

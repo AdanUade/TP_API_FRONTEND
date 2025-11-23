@@ -76,6 +76,7 @@ export const GuestRoute = ({ children, ...props }) => (
   <ProtectedRoute 
     requireAuth={false} 
     deniedRoles={['ADMIN', 'SELLER', 'USER']}
+    {...props}
   >
     {children}
   </ProtectedRoute>
