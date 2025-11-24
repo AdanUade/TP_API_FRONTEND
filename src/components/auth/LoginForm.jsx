@@ -6,6 +6,7 @@ import { useForm } from '../../hooks';
 import { isValidEmail, isNotEmpty } from '../../utils';
 import { Button, ErrorGenerico as ErrorForm } from '../common';
 import FormField from '../common/FormField';
+import { toast } from 'react-toastify';
 
 const LoginForm = () => {
     const navigate = useNavigate();
@@ -23,7 +24,10 @@ const LoginForm = () => {
     const handleLogin = async (formValues) => {
         const resultAction = await dispatch(loginUser(formValues));
         if (loginUser.fulfilled.match(resultAction)) {
+            toast.success(`¡Bienvenido de nuevo, ${resultAction.payload.name}! 👋`);
             navigate(from, { replace: true });
+        } else {
+            toast.error(resultAction.payload || 'Error al iniciar sesión');
         }
     };
 

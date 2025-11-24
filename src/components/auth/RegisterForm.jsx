@@ -7,6 +7,7 @@ import { isValidEmail, isValidPassword } from '../../utils/validators';
 import Button from '../common/Button';
 import ErrorForm from '../common/ErrorGenerico';
 import FormField from '../common/FormField';
+import { toast } from 'react-toastify';
 
 const MIN_PASSWORD_LENGTH = 8;
 const MIN_NAME_LENGTH = 3;
@@ -32,7 +33,10 @@ const RegisterForm = () => {
         }));
 
         if (registerUser.fulfilled.match(resultAction)) {
+            toast.success(`¡Bienvenido a bordo, ${resultAction.payload.name}! 🚀`);
             navigate('/', { replace: true });
+        } else {
+            toast.error(resultAction.payload || 'Error en el registro');
         }
     };
 

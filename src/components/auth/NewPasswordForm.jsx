@@ -7,6 +7,7 @@ import { isValidPassword } from '../../utils/validators';
 import Button from '../common/Button';
 import ErrorGenerico from '../common/ErrorGenerico';
 import FormField from '../common/FormField';
+import { toast } from 'react-toastify';
 
 const MIN_PASSWORD_LENGTH = 8;
 
@@ -25,9 +26,12 @@ const NewPasswordForm = () => {
         const resultAction = await dispatch(updatePassword({ password: formValues.newPassword }));
         if (updatePassword.fulfilled.match(resultAction)) {
             setSuccess(true);
+            toast.success('Contraseña actualizada correctamente');
             setTimeout(() => {
                 navigate('/perfil');
             }, 2000);
+        } else {
+            toast.error(resultAction.payload || 'Error al actualizar contraseña');
         }
     };
 

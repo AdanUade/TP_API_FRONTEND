@@ -4,12 +4,11 @@ import { deleteProduct } from '../../store/productSlice';
 import Button from './Button';
 import ErrorGenerico from './ErrorGenerico';
 import { getToken } from '../../api/AuthApi';
+import { toast } from 'react-toastify';
 
 const DeleteProductButton = ({ productId, productName, onDeleted }) => {
     const dispatch = useDispatch();
     const [confirming, setConfirming] = useState(false);
-    const [deleted, setDeleted] = useState(false);
-    const [message, setMessage] = useState(null);
     const [loading, setLoading] = useState(false);
 
     const startDelete = () => setConfirming(true);
@@ -17,7 +16,6 @@ const DeleteProductButton = ({ productId, productName, onDeleted }) => {
 
     const confirmDelete = async () => {
         setLoading(true);
-        setMessage(null);
         try {
             const token = getToken();
             console.debug('DeleteProductButton: token present?', !!token);
@@ -28,8 +26,7 @@ const DeleteProductButton = ({ productId, productName, onDeleted }) => {
             const resultAction = await dispatch(deleteProduct({ productId, token }));
 
             if (deleteProduct.fulfilled.match(resultAction)) {
-                setMessage(`Producto "${productName}" eliminado correctamente`);
-                setDeleted(true);
+                toast.success(`Producto "${productName}" eliminado correctamente`);
                 setConfirming(false);
                 if (onDeleted) onDeleted(productId);
             } else {
@@ -45,26 +42,21 @@ const DeleteProductButton = ({ productId, productName, onDeleted }) => {
                      try { msg = JSON.stringify(err); } catch { /* ignore */ }
                 }
             }
-            setMessage(msg);
-            setDeleted(true);
+            toast.error(msg);
             setConfirming(false);
         } finally {
             setLoading(false);
         }
     };
 
-    if (deleted && message) {
-        return <ErrorGenerico message={message} />;
-    }
-
     return (
         <>
-            {!confirming && !deleted && (
+            {!confirming && (
                 <Button onClick={startDelete} variant="danger" disabled={loading}>
                     Eliminar
                 </Button>
             )}
-            {confirming && !deleted && (
+            {confirming && (
                 <div className="flex gap-2">
                     <Button onClick={confirmDelete} variant="danger" className="flex-1" disabled={loading}>
                         {loading ? 'Eliminando...' : 'Confirmar eliminación'}

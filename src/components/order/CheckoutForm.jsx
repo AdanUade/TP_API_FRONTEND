@@ -8,6 +8,7 @@ import ShippingForm from './ShippingForm';
 import PaymentForm from './PaymentForm';
 import Button from '../common/Button';
 import ErrorGenerico from '../common/ErrorGenerico';
+import { toast } from 'react-toastify';
 
 const CheckoutForm = () => {
     const { user } = useSelector(state => state.user);
@@ -37,6 +38,7 @@ const CheckoutForm = () => {
     useEffect(() => {
         if (success && currentOrder) {
              dispatch(clearCart());
+             toast.success(`¡Orden #${currentOrder.id} creada exitosamente! 🎉`);
              navigate('/perfil/orders', {
                  state: {
                      orderSuccess: true,
@@ -50,7 +52,9 @@ const CheckoutForm = () => {
     useEffect(() => {
         if (orderError) {
              console.error('❌ Error al crear orden:', orderError);
-             setError(typeof orderError === 'string' ? orderError : 'Error al procesar el pago. Intenta de nuevo.');
+             const errorMessage = typeof orderError === 'string' ? orderError : 'Error al procesar el pago. Intenta de nuevo.';
+             setError(errorMessage);
+             toast.error(errorMessage);
         }
     }, [orderError, setError]);
 

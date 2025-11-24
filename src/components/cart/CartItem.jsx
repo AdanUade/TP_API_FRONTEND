@@ -3,6 +3,7 @@ import { updateQuantity, removeFromCart } from '../../store/cartSlice';
 import { QuantitySelector, PriceDisplay, Button } from '../common';
 import CardImage from '../products/CardImage';
 import { formatPrice,calculateItemPrice, calculateItemSubtotal } from '../../utils';
+import { toast } from 'react-toastify';
 
 const CartItem = ({ item, image }) => {
     const dispatch = useDispatch();
@@ -54,7 +55,10 @@ const CartItem = ({ item, image }) => {
             <div className="flex items-center gap-4">
                 <p className="text-2xl font-bold w-24 text-right">{formatPrice(subtotal)}</p>
                 <Button 
-                    onClick={() => dispatch(removeFromCart(item.id))}
+                    onClick={() => {
+                        dispatch(removeFromCart(item.id));
+                        toast.info('Producto eliminado del carrito');
+                    }}
                     variant="danger"
                     className="!w-10 !h-10 !p-2 rounded-full !text-xl flex items-center justify-center cursor-pointer"
                 >

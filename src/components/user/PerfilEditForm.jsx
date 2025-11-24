@@ -7,6 +7,7 @@ import { isValidEmail } from '../../utils/validators';
 import FormField from '../common/FormField';
 import Button from '../common/Button';
 import ErrorGenerico from '../common/ErrorGenerico';
+import { toast } from 'react-toastify';
 
 const MIN_NAME_LENGTH = 3;
 
@@ -34,9 +35,12 @@ const PerfilEditForm = () => {
         const resultAction = await dispatch(updateProfile(updatedData));
         if (updateProfile.fulfilled.match(resultAction)) {
             setSuccess(true);
+            toast.success('Perfil actualizado exitosamente');
             setTimeout(() => {
                 navigate('/perfil');
             }, 2000);
+        } else {
+            toast.error(resultAction.payload || 'Error al actualizar perfil');
         }
     };
 
