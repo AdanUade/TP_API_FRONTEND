@@ -1,8 +1,5 @@
 import { API_ENDPOINTS, DEFAULT_PAGINATION } from '../constants/apiConfig'
-import {
-  getAuthHeaders,
-  getFormDataHeaders
-} from '../utils/apiHelpers'
+import { getAuthHeaders, getFormDataHeaders } from '../utils/apiHelpers'
 import api from './api'
 
 const BASE_URL = API_ENDPOINTS.PRODUCTS

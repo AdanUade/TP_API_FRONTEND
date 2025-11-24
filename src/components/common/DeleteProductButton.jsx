@@ -39,7 +39,7 @@ const DeleteProductButton = ({ productId, productName, onDeleted }) => {
                 if (typeof err === 'string') msg = err;
                 else if (err.message) msg = err.message;
                 else {
-                     try { msg = JSON.stringify(err); } catch { /* ignore */ }
+                    try { msg = JSON.stringify(err); } catch { /* ignore */ }
                 }
             }
             toast.error(msg);

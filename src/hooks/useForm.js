@@ -1,15 +1,5 @@
 import { useState, useCallback } from 'react';
 
-/**
- * Hook reutilizable y completo para la gestión de formularios.
- * Maneja el estado de los valores del formulario, la validación, los errores,
- * el estado de envío y proporciona los manejadores de eventos necesarios.
- *
- * @param {object} [initialValues={}] - Un objeto con los valores iniciales del formulario.
- * @param {function} onSubmit - La función que se llamará con los valores del formulario cuando este se envíe y sea válido.
- * @param {object} [validationRules={}] - Un objeto donde las claves son los nombres de los campos y los valores son funciones de validación.
- * @returns {{values: object, errors: object, touched: object, isSubmitting: boolean, handleChange: function, handleBlur: function, handleSubmit: function, reset: function, setFormValues: function, setFieldError: function, isValid: boolean, isFieldTouched: function, hasErrors: boolean}} - El estado completo y los manejadores del formulario.
- */
 export const useForm = (initialValues = {}, onSubmit, validationRules = {}) => {
     // Almacena los valores actuales de todos los campos del formulario.
     const [values, setValues] = useState(initialValues);
@@ -66,7 +56,7 @@ export const useForm = (initialValues = {}, onSubmit, validationRules = {}) => {
     // Manejador para el evento `onSubmit` del formulario.
     const handleSubmit = useCallback(async (e) => {
         if (e) e.preventDefault(); // Previene el comportamiento por defecto del formulario HTML.
-        
+
         // Valida todo el formulario y muestra los errores si no es válido.
         if (!validateForm(true)) {
             return;

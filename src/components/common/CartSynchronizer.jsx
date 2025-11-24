@@ -7,35 +7,41 @@ const CartSynchronizer = () => {
     const { user } = useSelector(state => state.user);
     const { items: cartItems } = useSelector(state => state.cart);
     const isMounting = useRef(true);
+    const prevUserRef = useRef(null);
 
     useEffect(() => {
-        if (user) {
-            if (user.rol === 'SELLER' || user.rol === 'ADMIN') {
+        // Usuario actual
+        const currentUser = user;
+        const previousUser = prevUserRef.current;
+
+        if (currentUser) {
+            // Si es SELLER o ADMIN, limpiar carrito
+            if (currentUser.rol === 'SELLER' || currentUser.rol === 'ADMIN') {
                 dispatch(setCartItems([]));
+                prevUserRef.current = currentUser;
                 return;
             }
 
-            // Si es el montaje inicial y tenemos usuario (persisted), asumimos que la sesión se restauró.
-            // En este caso, NO sincronizamos el carrito local como "guest", sino que cargamos del servidor
-            // para evitar duplicaciones o re-envíos innecesarios.
+            // Detectar si es un LOGIN NUEVO (no una restauración de Redux Persist)
+            const isNewLogin = previousUser === null && !isMounting.current;
+
             if (isMounting.current) {
+                // Primera carga: solo cargar del servidor
                 dispatch(loadCartFromServer());
                 isMounting.current = false;
-                return;
-            }
-
-            // Si el usuario CAMBIA (login explícito), ahí sí sincronizamos el carrito guest.
-            if (cartItems.length > 0) {
-                 dispatch(syncGuestCartToServer(cartItems));
-            } else {
+            } else if (isNewLogin && cartItems.length > 0) {
+                // Login nuevo con carrito guest: sincronizar
+                dispatch(syncGuestCartToServer(cartItems));
+            } else if (isNewLogin) {
+                // Login nuevo sin carrito guest: cargar del servidor
                 dispatch(loadCartFromServer());
             }
         } else {
-             // Guest user: Do not clear cart on mount to allow persistence.
-             // Only clear if explicit logout logic handles it, or if we want fresh start sessions.
-             // With redux-persist, we want to keep guest cart.
-             isMounting.current = false;
+            // Usuario guest: mantener carrito en localStorage
+            isMounting.current = false;
         }
+
+        prevUserRef.current = currentUser;
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [user, dispatch]);
 

@@ -9,6 +9,7 @@ import ErrorGenerico from '../../components/common/ErrorGenerico';
 const Checkout = () => {
     const { user, isLoading } = useSelector(state => state.user);
     const { items: cartItems } = useSelector(state => state.cart);
+    const { success: orderSuccess } = useSelector(state => state.orders);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -18,11 +19,11 @@ const Checkout = () => {
             return;
         }
 
-        // Verificar que el carrito no esté vacío
-        if (!isLoading && cartItems && cartItems.length === 0) {
+        // Verificar que el carrito no esté vacío (solo si NO hay una orden exitosa)
+        if (!isLoading && cartItems && cartItems.length === 0 && !orderSuccess) {
             navigate('/cart');
         }
-    }, [user, isLoading, cartItems, navigate]);
+    }, [user, isLoading, cartItems, navigate, orderSuccess]);
 
     if (isLoading) {
         return <LoadingSpinner />;
@@ -44,8 +45,8 @@ const Checkout = () => {
 
     return (
         <>
-            <PageTitle 
-                title="Finalizar Compra" 
+            <PageTitle
+                title="Finalizar Compra"
                 subtitle="Completa tu información para procesar el pedido"
             />
             <div className="max-w-3xl mx-auto">

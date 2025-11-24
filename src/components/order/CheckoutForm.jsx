@@ -15,7 +15,7 @@ const CheckoutForm = () => {
     const { isLoading, error: orderError, success, currentOrder } = useSelector(state => state.orders);
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    
+
     const [formData, setFormData] = useState({
         name: user?.name || '',
         email: user?.email || '',
@@ -24,7 +24,7 @@ const CheckoutForm = () => {
         expiryDate: '12/25',
         cvv: '123'
     });
-    
+
     // Hook de validación personalizado
     const { error: validationError, setError, validateForm, clearError } = useCheckoutValidation();
 
@@ -37,24 +37,24 @@ const CheckoutForm = () => {
     // Handle success
     useEffect(() => {
         if (success && currentOrder) {
-             dispatch(clearCart());
-             toast.success(`¡Orden #${currentOrder.id} creada exitosamente! 🎉`);
-             navigate('/perfil/orders', {
-                 state: {
-                     orderSuccess: true,
-                     orderId: currentOrder.id
-                 }
-             });
+            dispatch(clearCart());
+            toast.success(`¡Orden #${currentOrder.id} creada exitosamente! 🎉`);
+            navigate('/perfil/orders', {
+                state: {
+                    orderSuccess: true,
+                    orderId: currentOrder.id
+                }
+            });
         }
     }, [success, currentOrder, dispatch, navigate]);
 
     // Handle API errors
     useEffect(() => {
         if (orderError) {
-             console.error('❌ Error al crear orden:', orderError);
-             const errorMessage = typeof orderError === 'string' ? orderError : 'Error al procesar el pago. Intenta de nuevo.';
-             setError(errorMessage);
-             toast.error(errorMessage);
+            console.error('❌ Error al crear orden:', orderError);
+            const errorMessage = typeof orderError === 'string' ? orderError : 'Error al procesar el pago. Intenta de nuevo.';
+            setError(errorMessage);
+            toast.error(errorMessage);
         }
     }, [orderError, setError]);
 
@@ -85,6 +85,7 @@ const CheckoutForm = () => {
         };
 
         dispatch(createNewOrder(orderRequest));
+
     };
 
     const handleCancel = () => {
@@ -100,7 +101,7 @@ const CheckoutForm = () => {
             {(validationError || orderError) && <ErrorGenerico message={validationError || (typeof orderError === 'string' ? orderError : 'Error en la orden')} />}
 
             <form onSubmit={handleSubmit} className="space-y-6">
-                <ShippingForm 
+                <ShippingForm
                     formData={formData}
                     onChange={handleChange}
                     isLoading={isLoading}
@@ -122,7 +123,7 @@ const CheckoutForm = () => {
                         disabled={isLoading}
                         className="flex-1 text-xl py-4"
                     >
-                        {isLoading ? '⏳ Procesando...' : '💰 ¡Pagar y Realizar Pedido!'}
+                        {isLoading ? 'Procesando...' : 'Pagar y Realizar Pedido!'}
                     </Button>
 
                     <Button

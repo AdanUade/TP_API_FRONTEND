@@ -1,23 +1,24 @@
 import { createSlice, createAsyncThunk, createSelector } from '@reduxjs/toolkit';
 import * as CartApi from '../api/CartApi';
 import { adaptServerItemToLocal, calculateCartTotal, calculateTotalItems, calculateTotalSavings } from '../utils/cartHelpers';
+import { logoutUser } from './userSlice';
 
 export const loadCartFromServer = createAsyncThunk(
     'cart/loadCartFromServer',
     async (_, { getState, rejectWithValue }) => {
-         const user = getState().user.user;
-         if (!user) return [];
+        const user = getState().user.user;
+        if (!user) return [];
 
-         try {
-             const serverCart = await CartApi.viewCart();
-             if (serverCart.items && serverCart.items.length > 0) {
-                 return serverCart.items.map(adaptServerItemToLocal);
-             }
-             return [];
-         } catch (err) {
-             console.error('Error al cargar carrito del servidor:', err);
-             return rejectWithValue(err.toString());
-         }
+        try {
+            const serverCart = await CartApi.viewCart();
+            if (serverCart.items && serverCart.items.length > 0) {
+                return serverCart.items.map(adaptServerItemToLocal);
+            }
+            return [];
+        } catch (err) {
+            console.error('Error al cargar carrito del servidor:', err);
+            return rejectWithValue(err.toString());
+        }
     }
 );
 
@@ -34,8 +35,8 @@ export const syncGuestCartToServer = createAsyncThunk(
             }
             dispatch(loadCartFromServer());
         } catch (err) {
-             console.error('❌ Error al sincronizar carrito:', err);
-             return rejectWithValue(err.toString());
+            console.error('❌ Error al sincronizar carrito:', err);
+            return rejectWithValue(err.toString());
         }
     }
 );
@@ -66,12 +67,12 @@ const cartSlice = createSlice({
         },
         localUpdateQuantity: (state, action) => {
             const { productId, quantity } = action.payload;
-             if (quantity < 1) {
-                 state.items = state.items.filter(item => item.id !== productId);
-             } else {
-                 const item = state.items.find(item => item.id === productId);
-                 if (item) item.quantity = quantity;
-             }
+            if (quantity < 1) {
+                state.items = state.items.filter(item => item.id !== productId);
+            } else {
+                const item = state.items.find(item => item.id === productId);
+                if (item) item.quantity = quantity;
+            }
         },
         localClearCart: (state) => {
             state.items = [];
@@ -104,6 +105,12 @@ const cartSlice = createSlice({
             .addCase(syncGuestCartToServer.rejected, (state, action) => {
                 state.isSyncing = false;
                 state.error = action.payload;
+            })
+            // Limpiar carrito al hacer logout
+            .addCase(logoutUser.fulfilled, (state) => {
+                state.items = [];
+                state.isSyncing = false;
+                state.error = null;
             });
     }
 });
@@ -161,8 +168,8 @@ export const removeFromCart = (productId) => (dispatch, getState) => {
 
 export const updateQuantity = (productId, newQuantity) => (dispatch, getState) => {
     if (newQuantity < 1) {
-       dispatch(removeFromCart(productId));
-       return;
+        dispatch(removeFromCart(productId));
+        return;
     }
 
     // We get the item from state to calculate difference
@@ -178,16 +185,16 @@ export const updateQuantity = (productId, newQuantity) => (dispatch, getState) =
     const user = state.user.user;
     if (user && quantityDifference !== 0) {
         CartApi.updateCart(productId, quantityDifference)
-             .then(serverCart => {
-                 if (serverCart.items) {
-                     const adaptedItems = serverCart.items.map(adaptServerItemToLocal);
-                     dispatch(setCartItems(adaptedItems));
-                 }
-             })
-             .catch(err => {
-                 console.error('Error al actualizar servidor:', err);
-                 dispatch(loadCartFromServer());
-             });
+            .then(serverCart => {
+                if (serverCart.items) {
+                    const adaptedItems = serverCart.items.map(adaptServerItemToLocal);
+                    dispatch(setCartItems(adaptedItems));
+                }
+            })
+            .catch(err => {
+                console.error('Error al actualizar servidor:', err);
+                dispatch(loadCartFromServer());
+            });
     }
 };
 
