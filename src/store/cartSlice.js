@@ -29,10 +29,16 @@ export const syncGuestCartToServer = createAsyncThunk(
         if (!guestItems || guestItems.length === 0 || !user) return;
 
         try {
-            await CartApi.clearCart();
+            // Recorremos los items locales y los subimos uno por uno
             for (const item of guestItems) {
-                await CartApi.addToCart(item.id, item.quantity);
+                try {
+                    await CartApi.addToCart(item.id, item.quantity);
+                } catch (innerErr) {
+                    // Si falla uno (ej. duplicado), seguimos con el siguiente
+                    console.warn(`⚠️ No se pudo sincronizar item ${item.id}:`, innerErr);
+                }
             }
+            // Al final, recargamos el carrito completo del servidor (fusión final)
             dispatch(loadCartFromServer());
         } catch (err) {
             console.error('❌ Error al sincronizar carrito:', err);

@@ -25,6 +25,8 @@ const CheckoutForm = () => {
         cvv: '123'
     });
 
+    const [hasSubmitted, setHasSubmitted] = useState(false);
+
     // Hook de validación personalizado
     const { error: validationError, setError, validateForm, clearError } = useCheckoutValidation();
 
@@ -36,7 +38,7 @@ const CheckoutForm = () => {
 
     // Handle success
     useEffect(() => {
-        if (success && currentOrder) {
+        if (success && currentOrder && hasSubmitted) {
             dispatch(clearCart());
             toast.success(`¡Orden #${currentOrder.id} creada exitosamente! 🎉`);
             navigate('/perfil/orders', {
@@ -46,17 +48,18 @@ const CheckoutForm = () => {
                 }
             });
         }
-    }, [success, currentOrder, dispatch, navigate]);
+    }, [success, currentOrder, hasSubmitted, dispatch, navigate]);
 
     // Handle API errors
     useEffect(() => {
-        if (orderError) {
+        if (orderError && hasSubmitted) {
             console.error('❌ Error al crear orden:', orderError);
             const errorMessage = typeof orderError === 'string' ? orderError : 'Error al procesar el pago. Intenta de nuevo.';
             setError(errorMessage);
             toast.error(errorMessage);
+            setHasSubmitted(false); // Reset submit state on error
         }
-    }, [orderError, setError]);
+    }, [orderError, hasSubmitted, setError]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -77,6 +80,8 @@ const CheckoutForm = () => {
         if (!validateForm(formData)) {
             return;
         }
+
+        setHasSubmitted(true);
 
         // Crear orden con estado PAID (pagada)
         const orderRequest = {
