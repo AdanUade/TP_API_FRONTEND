@@ -22,22 +22,25 @@ const CartSynchronizer = () => {
                 return;
             }
 
-            // Detectar si es un LOGIN NUEVO (no una restauración de Redux Persist)
+            // Detectar si es un login nuevo
             const isNewLogin = previousUser === null && !isMounting.current;
 
             if (isMounting.current) {
-                // Primera carga: solo cargar del servidor
-                dispatch(loadCartFromServer());
+                // Primera carga: intentar cargar del servidor si hay usuario (aunque será null sin persistencia)
+                if (currentUser) {
+                    dispatch(loadCartFromServer());
+                }
                 isMounting.current = false;
-            } else if (isNewLogin && cartItems.length > 0) {
-                // Login nuevo con carrito guest: sincronizar
-                dispatch(syncGuestCartToServer(cartItems));
             } else if (isNewLogin) {
-                // Login nuevo sin carrito guest: cargar del servidor
-                dispatch(loadCartFromServer());
+                if (cartItems.length > 0) {
+                     // Login nuevo con items en memoria: sincronizar
+                    dispatch(syncGuestCartToServer(cartItems));
+                } else {
+                     // Login nuevo sin items: cargar del servidor
+                    dispatch(loadCartFromServer());
+                }
             }
         } else {
-            // Usuario guest: mantener carrito en localStorage
             isMounting.current = false;
         }
 

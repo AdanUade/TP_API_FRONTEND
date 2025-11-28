@@ -1,7 +1,9 @@
-import { API_ENDPOINTS, TOKEN_KEY } from '../constants/apiConfig'
+import { API_ENDPOINTS } from '../constants/apiConfig'
 import api from './api'
 
 const BASE_URL = API_ENDPOINTS.AUTH
+
+let accessToken = null;
 
 export const register = async (registerRequest) => {
   const response = await api.post(`${BASE_URL}/register`, registerRequest)
@@ -13,18 +15,18 @@ export const authenticate = async (authRequest) => {
   return response.data
 }
 
-export const saveToken = (accessToken) => {
-  localStorage.setItem(TOKEN_KEY, accessToken)
+export const saveToken = (token) => {
+  accessToken = token;
 }
 
 export const getToken = () => {
-    return localStorage.getItem(TOKEN_KEY);
+    return accessToken;
 };
 
 export const removeToken = () => {
-    localStorage.removeItem(TOKEN_KEY);
+    accessToken = null;
 };
 
 export const isAuthenticated = () => {
-    return getToken() !== null;
+    return accessToken !== null;
 };
