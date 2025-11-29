@@ -1,15 +1,20 @@
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { updateProfile } from '../../store/userSlice';
-import { useForm } from '../../hooks/useForm';
-import { isValidEmail } from '../../utils/validators';
 import FormField from '../common/FormField';
 import Button from '../common/Button';
 import ErrorGenerico from '../common/ErrorGenerico';
 import { toast } from 'react-toastify';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 
-const MIN_NAME_LENGTH = 3;
+// Simplified schema for this form since it only updates name/email
+const editProfileSchema = z.object({
+  name: z.string().min(3, 'El nombre debe tener al menos 3 caracteres'),
+  email: z.string().email('Email inválido').min(1, 'El email es requerido'),
+});
 
 const PerfilEditForm = () => {
     const dispatch = useDispatch();
@@ -17,18 +22,26 @@ const PerfilEditForm = () => {
     const navigate = useNavigate();
     const [success, setSuccess] = useState(false);
 
-    const validationRules = useMemo(() => ({
-        name: (value) => value.trim().length >= MIN_NAME_LENGTH,
-        email: (value) => isValidEmail(value)
-    }), []);
+    const {
+        register,
+        handleSubmit,
+        formState: { errors, isValid, isSubmitting: isFormSubmitting }
+    } = useForm({
+        resolver: zodResolver(editProfileSchema),
+        mode: 'onBlur',
+        defaultValues: {
+            name: user?.name || '',
+            email: user?.email || ''
+        }
+    });
 
-    const handleUpdateProfile = async (formValues) => {
+    const handleUpdateProfile = async (data) => {
         const updatedData = {};
-        if (formValues.name !== user?.name) updatedData.name = formValues.name;
-        if (formValues.email !== user?.email) updatedData.email = formValues.email;
+        if (data.name !== user?.name) updatedData.name = data.name;
+        if (data.email !== user?.email) updatedData.email = data.email;
 
         if (Object.keys(updatedData).length === 0) {
-            // TODO: Handle 'no changes' closer to UI or ignore
+             toast.info('No se detectaron cambios');
             return;
         }
 
@@ -43,23 +56,6 @@ const PerfilEditForm = () => {
             toast.error(resultAction.payload || 'Error al actualizar perfil');
         }
     };
-
-    const {
-        values,
-        errors,
-        isSubmitting,
-        handleChange,
-        handleBlur,
-        handleSubmit,
-    } = useForm(
-        { name: user?.name || '', email: user?.email || '' },
-        handleUpdateProfile,
-        validationRules
-    );
-
-    const isFormValid = useMemo(() => {
-        return validationRules.name(values.name) && validationRules.email(values.email);
-    }, [values, validationRules]);
 
     const handleCancel = () => {
         navigate('/perfil');
@@ -76,66 +72,44 @@ const PerfilEditForm = () => {
                 </div>
             )}
 
-            <form onSubmit={handleSubmit} className="space-y-6 max-w-lg mx-auto">
+            <form onSubmit={handleSubmit(handleUpdateProfile)} className="space-y-6 max-w-lg mx-auto">
                 <FormField
                     label="Nombre:"
                     type="text"
-                    name="name"
-                    value={values.name}
-                    onChange={handleChange}
-                    onBlur={handleBlur}
                     placeholder="Tu nombre completo"
                     autoComplete="name"
                     required
-                    disabled={isSubmitting || isLoading}
-                    validationError={errors.name}
-                    warningMessage={
-                        values.name.length > 0 && 
-                        values.name.length < MIN_NAME_LENGTH
-                            ? `Faltan ${MIN_NAME_LENGTH - values.name.length} caracteres más`
-                            : null
-                    }
-                    validationSuccess={
-                        values.name.length >= MIN_NAME_LENGTH
-                            ? 'Nombre válido'
-                            : null
-                    }
+                    disabled={isFormSubmitting || isLoading}
+                    validationError={errors.name?.message}
+                    {...register('name')}
                 />
 
                 <FormField
                     label="Email:"
                     type="email"
-                    name="email"
-                    value={values.email}
-                    onChange={handleChange}
-                    onBlur={handleBlur}
                     placeholder="tu@email.com"
                     autoComplete="email"
                     required
-                    disabled={isSubmitting || isLoading}
-                    validationError={errors.email}
-                    validationSuccess={
-                        isValidEmail(values.email)
-                            ? 'Email válido'
-                            : null
-                    }
+                    disabled={isFormSubmitting || isLoading}
+                    validationError={errors.email?.message}
+                    {...register('email')}
                 />
 
                 <div className="flex flex-col sm:flex-row gap-4">
                     <Button 
                         type="submit" 
                         variant="success"
-                        disabled={isSubmitting || isLoading || !isFormValid}
+                        disabled={isFormSubmitting || isLoading || !isValid}
                         className="flex-1"
                     >
-                        {isLoading || isSubmitting ? 'Actualizando...' : 'Guardar Cambios'}
+                        {isLoading || isFormSubmitting ? 'Actualizando...' : 'Guardar Cambios'}
                     </Button>
                     
                     <Button 
                         type="button"
                         onClick={handleCancel}
                         variant="danger"
-                        disabled={isSubmitting || isLoading}
+                        disabled={isFormSubmitting || isLoading}
                         className="flex-1"
                     >
                         Cancelar

@@ -1,15 +1,16 @@
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { updatePassword } from '../../store/userSlice';
-import { useForm } from '../../hooks/useForm';
-import { isValidPassword } from '../../utils/validators';
 import Button from '../common/Button';
 import ErrorGenerico from '../common/ErrorGenerico';
 import FormField from '../common/FormField';
 import { toast } from 'react-toastify';
+import { useForm, useWatch } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { passwordSchema } from '../../utils/validationSchemas';
 
-const MIN_PASSWORD_LENGTH = 8;
+const MIN_PASSWORD_LENGTH = 6; // Updated to match schema
 
 const NewPasswordForm = () => {
     const navigate = useNavigate();
@@ -17,13 +18,29 @@ const NewPasswordForm = () => {
     const { isLoading, error } = useSelector(state => state.user);
     const [success, setSuccess] = useState(false);
 
-    const validationRules = useMemo(() => ({
-        newPassword: (value) => isValidPassword(value, MIN_PASSWORD_LENGTH),
-        confirmPassword: (value, allValues) => value === allValues.newPassword
-    }), []);
+    const {
+        register,
+        handleSubmit,
+        control,
+        formState: { errors, isValid, isSubmitting: isFormSubmitting }
+    } = useForm({
+        resolver: zodResolver(passwordSchema),
+        mode: 'onBlur',
+        defaultValues: {
+            currentPassword: '',
+            newPassword: '',
+            confirmNewPassword: ''
+        }
+    });
 
-    const handleUpdatePassword = async (formValues) => {
-        const resultAction = await dispatch(updatePassword({ password: formValues.newPassword }));
+    const watchedNewPassword = useWatch({ control, name: 'newPassword' });
+    const watchedConfirmPassword = useWatch({ control, name: 'confirmNewPassword' });
+
+    const handleUpdatePassword = async (data) => {
+        const resultAction = await dispatch(updatePassword({
+            oldPassword: data.currentPassword, // Assuming backend needs old password too? Schema had it.
+            password: data.newPassword
+        }));
         if (updatePassword.fulfilled.match(resultAction)) {
             setSuccess(true);
             toast.success('Contraseña actualizada correctamente');
@@ -34,24 +51,6 @@ const NewPasswordForm = () => {
             toast.error(resultAction.payload || 'Error al actualizar contraseña');
         }
     };
-
-    const {
-        values,
-        errors,
-        isSubmitting,
-        handleChange,
-        handleBlur,
-        handleSubmit,
-    } = useForm(
-        { newPassword: '', confirmPassword: '' },
-        handleUpdatePassword,
-        validationRules
-    );
-
-    const isFormValid = useMemo(() => {
-        return validationRules.newPassword(values.newPassword) &&
-               validationRules.confirmPassword(values.confirmPassword, values);
-    }, [values, validationRules]);
 
     const handleCancel = () => {
         navigate('/perfil');
@@ -68,76 +67,81 @@ const NewPasswordForm = () => {
                 </div>
             )}
 
-            <form onSubmit={handleSubmit} className="space-y-6 max-w-lg mx-auto">
+            <form onSubmit={handleSubmit(handleUpdatePassword)} className="space-y-6 max-w-lg mx-auto">
+                <FormField
+                    label="Contraseña Actual:"
+                    type="password"
+                    placeholder="Tu contraseña actual"
+                    autoComplete="current-password"
+                    required
+                    disabled={isFormSubmitting || isLoading}
+                    validationError={errors.currentPassword?.message}
+                    {...register('currentPassword')}
+                />
+
                 <FormField
                     label="Nueva Contraseña:"
                     type="password"
-                    name="newPassword"
-                    value={values.newPassword}
-                    onChange={handleChange}
-                    onBlur={handleBlur}
                     placeholder={`Mínimo ${MIN_PASSWORD_LENGTH} caracteres`}
                     autoComplete="new-password"
                     required
-                    disabled={isSubmitting || isLoading}
-                    validationError={errors.newPassword}
+                    disabled={isFormSubmitting || isLoading}
+                    validationError={errors.newPassword?.message}
                     warningMessage={
-                        values.newPassword && 
-                        values.newPassword.length > 0 && 
-                        values.newPassword.length < MIN_PASSWORD_LENGTH 
-                            ? `Faltan ${MIN_PASSWORD_LENGTH - values.newPassword.length} caracteres más`
+                        watchedNewPassword &&
+                        watchedNewPassword.length > 0 &&
+                        watchedNewPassword.length < MIN_PASSWORD_LENGTH
+                            ? `Faltan ${MIN_PASSWORD_LENGTH - watchedNewPassword.length} caracteres más`
                             : null
                     }
                     validationSuccess={
-                        values.newPassword && !errors.newPassword && values.newPassword.length >= MIN_PASSWORD_LENGTH
+                        watchedNewPassword && !errors.newPassword && watchedNewPassword.length >= MIN_PASSWORD_LENGTH
                             ? 'Contraseña válida' 
                             : null
                     }
+                    {...register('newPassword')}
                 />
 
                 <FormField
                     label="Confirmar Nueva Contraseña:"
                     type="password"
-                    name="confirmPassword"
-                    value={values.confirmPassword}
-                    onChange={handleChange}
-                    onBlur={handleBlur}
                     placeholder="Repite la nueva contraseña"
                     autoComplete="new-password"
                     required
-                    disabled={isSubmitting || isLoading}
-                    validationError={errors.confirmPassword}
+                    disabled={isFormSubmitting || isLoading}
+                    validationError={errors.confirmNewPassword?.message}
                     warningMessage={
-                        values.confirmPassword && 
-                        values.newPassword !== values.confirmPassword 
+                        watchedConfirmPassword &&
+                        watchedNewPassword !== watchedConfirmPassword
                             ? 'Las contraseñas no coinciden'
                             : null
                     }
                     validationSuccess={
-                        values.confirmPassword &&
-                        !errors.confirmPassword &&
-                        values.newPassword === values.confirmPassword &&
-                        values.newPassword.length >= MIN_PASSWORD_LENGTH
+                        watchedConfirmPassword &&
+                        !errors.confirmNewPassword &&
+                        watchedNewPassword === watchedConfirmPassword &&
+                        watchedNewPassword.length >= MIN_PASSWORD_LENGTH
                             ? 'Las contraseñas coinciden' 
                             : null
                     }
+                    {...register('confirmNewPassword')}
                 />
 
                 <div className="flex flex-col sm:flex-row gap-4">
                     <Button 
                         type="submit" 
                         variant="success"
-                        disabled={isSubmitting || isLoading || !isFormValid}
+                        disabled={isFormSubmitting || isLoading || !isValid}
                         className="flex-1"
                     >
-                        {isLoading || isSubmitting ? 'Actualizando...' : 'Actualizar Contraseña'}
+                        {isLoading || isFormSubmitting ? 'Actualizando...' : 'Actualizar Contraseña'}
                     </Button>
                     
                     <Button 
                         type="button"
                         onClick={handleCancel}
                         variant="danger"
-                        disabled={isSubmitting || isLoading}
+                        disabled={isFormSubmitting || isLoading}
                         className="flex-1"
                     >
                         Cancelar
