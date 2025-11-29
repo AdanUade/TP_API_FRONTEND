@@ -1,10 +1,12 @@
-const Input = ({ 
+import React from 'react';
+
+const Input = React.forwardRef(({
     label, 
     type = 'text', 
     id, 
     name, 
-    value, 
     onChange, 
+    onBlur,
     placeholder = '', 
     required = false, 
     disabled = false,
@@ -15,7 +17,7 @@ const Input = ({
     maxLength,
     autoComplete,
     ...restProps
-}) => {
+}, ref) => {
     const isTextarea = type === 'textarea';
     
     // Estilos predeterminados adaptables
@@ -38,8 +40,9 @@ const Input = ({
                 type={isTextarea ? undefined : type}
                 id={id}
                 name={name}
-                value={value}
+                ref={ref}
                 onChange={onChange}
+                onBlur={onBlur}
                 className={defaultInputStyle}
                 placeholder={placeholder}
                 required={required}
@@ -51,6 +54,8 @@ const Input = ({
             />
         </div>
     );
-};
+});
+
+Input.displayName = 'Input';
 
 export default Input;

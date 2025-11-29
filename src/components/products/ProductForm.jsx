@@ -1,7 +1,5 @@
-import { useMemo, useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useForm } from '../../hooks/useForm';
-import { isNotEmpty } from '../../utils/validators';
 import { PRODUCT_CATEGORIES } from '../../constants/productCategories';
 import FormField from '../common/FormField';
 import Button from '../common/Button';
@@ -10,6 +8,9 @@ import { useDispatch, useSelector } from 'react-redux';
 import { createProduct, updateProduct } from '../../store/productSlice';
 import { getToken } from '../../utils/token';
 import { toast } from 'react-toastify';
+import { useForm, useWatch } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { productSchema } from '../../utils/validationSchemas';
 
 const ProductForm = ({ product, onSuccess }) => {
     const isEditMode = Boolean(product);
@@ -20,32 +21,83 @@ const ProductForm = ({ product, onSuccess }) => {
     const { isLoading, error } = useSelector(state => state.products);
     const [success, setSuccess] = useState(false);
 
-    const validationRules = useMemo(() => ({
-        name: (value) => isNotEmpty(value),
-        description: (value) => isNotEmpty(value),
-        price: (value) => !isNaN(parseFloat(value)) && parseFloat(value) > 0,
-        stock: (value) => !isNaN(parseInt(value, 10)) && parseInt(value, 10) >= 0,
-        category: (value) => isNotEmpty(value),
-        discount: (value, allValues) => {
-            if (!allValues.onSale) return true; // Not required if not on sale
-            return !isNaN(parseFloat(value)) && parseFloat(value) > 0 && parseFloat(value) <= 100;
-        },
-    }), []);
+    const {
+        register,
+        handleSubmit,
+        control,
+        reset,
+        setValue,
+        formState: { errors, isValid, isSubmitting: isFormSubmitting }
+    } = useForm({
+        resolver: zodResolver(productSchema),
+        mode: 'onBlur',
+        defaultValues: {
+            name: '',
+            description: '',
+            price: '',
+            discount: 0,
+            stock: '',
+            category: '',
+            status: 'AVAILABLE'
+        }
+    });
 
-    const handleProductSubmit = async (formValues) => {
+    // Custom logic to handle "onSale" UI state which isn't part of the schema directly but affects discount
+    const [isOnSale, setIsOnSale] = useState(false);
+    const watchedPrice = useWatch({ control, name: 'price' });
+    const watchedDiscount = useWatch({ control, name: 'discount' });
+
+    useEffect(() => {
+        if (isEditMode && product) {
+            const onSale = product.discount < 1;
+            setIsOnSale(onSale);
+
+            reset({
+                name: product.name || '',
+                description: product.description || '',
+                price: product.price,
+                discount: onSale ? Math.round((1 - product.discount) * 100) / 100 : 0, // Convert backend 0.8 (20% off) to 0.2
+                stock: product.stock,
+                category: product.category || '',
+                status: product.status || 'AVAILABLE'
+            });
+        }
+    }, [product, isEditMode, reset]);
+
+    useEffect(() => {
+        if (!isOnSale) {
+            setValue('discount', 0);
+        }
+    }, [isOnSale, setValue]);
+
+    const handleImageChange = (e) => {
+        setImage(e.target.files[0] || null);
+    };
+
+    const finalPrice = (() => {
+        const price = parseFloat(watchedPrice);
+        const discountVal = parseFloat(watchedDiscount);
+
+        if (isNaN(price)) return null;
+        if (!isOnSale || isNaN(discountVal)) return price;
+
+        return price * (1 - (discountVal || 0));
+    })();
+
+    const onSubmit = async (data) => {
         setSuccess(false);
         const token = getToken();
 
-        const pct = formValues.onSale ? parseFloat(formValues.discount) : 0;
-        const discountForBackend = (100 - Math.max(0, Math.min(100, pct))) / 100;
+        const discountValue = parseFloat(data.discount);
+        const discountForBackend = isOnSale ? (1 - discountValue) : 1;
 
         const productRequest = {
-            name: formValues.name,
-            description: formValues.description,
-            price: parseFloat(formValues.price),
+            name: data.name,
+            description: data.description,
+            price: parseFloat(data.price),
             discount: discountForBackend,
-            stock: parseInt(formValues.stock, 10),
-            category: formValues.category
+            stock: parseInt(data.stock, 10),
+            category: data.category
         };
 
         let resultAction;
@@ -64,6 +116,7 @@ const ProductForm = ({ product, onSuccess }) => {
             if (!isEditMode) {
                 reset();
                 setImage(null);
+                setIsOnSale(false);
                 if (imageInputRef.current) {
                     imageInputRef.current.value = '';
                 }
@@ -72,71 +125,6 @@ const ProductForm = ({ product, onSuccess }) => {
             toast.error('Error al guardar el producto');
         }
     };
-
-    const {
-        values,
-        errors,
-        isSubmitting,
-        handleChange,
-        handleBlur,
-        handleSubmit,
-        reset,
-        setFormValues
-    } = useForm(
-        {
-            name: '',
-            description: '',
-            price: '',
-            discount: '0',
-            stock: '',
-            category: '',
-            onSale: false
-        },
-        handleProductSubmit,
-        validationRules
-    );
-
-    useEffect(() => {
-        if (isEditMode && product) {
-            const onSale = product.discount < 1;
-            setFormValues({
-                name: product.name || '',
-                description: product.description || '',
-                price: product.price != null ? String(product.price) : '',
-                discount: onSale ? String(Math.round((100 - (product.discount * 100)) * 10) / 10) : '0',
-                stock: product.stock != null ? String(product.stock) : '',
-                category: product.category || '',
-                onSale: onSale
-            });
-        }
-    }, [product, isEditMode, setFormValues]);
-
-    useEffect(() => {
-        if (!values.onSale && values.discount !== '0') {
-            setFormValues({ discount: '0' });
-        }
-    }, [values.onSale, values.discount, setFormValues]);
-
-    const handleImageChange = (e) => {
-        setImage(e.target.files[0] || null);
-    };
-
-    const isFormValid = useMemo(() => {
-        return validationRules.name(values.name) &&
-            validationRules.description(values.description) &&
-            validationRules.price(values.price) &&
-            validationRules.stock(values.stock) &&
-            validationRules.category(values.category) &&
-            validationRules.discount(values.discount, values);
-    }, [values, validationRules]);
-
-    const finalPrice = useMemo(() => {
-        const price = parseFloat(values.price);
-        const pct = values.onSale ? parseFloat(values.discount) : 0;
-        if (isNaN(price) || isNaN(pct)) return null;
-        const multiplier = (100 - Math.max(0, Math.min(100, pct))) / 100;
-        return Math.round((price * multiplier) * 100) / 100;
-    }, [values.price, values.discount, values.onSale]);
 
     const successMessage = isEditMode ? "¡Producto actualizado!" : "¡Producto creado!";
     const buttonText = isEditMode ? "Actualizar producto" : "Crear producto";
@@ -147,18 +135,34 @@ const ProductForm = ({ product, onSuccess }) => {
             {error && <ErrorGenerico message={typeof error === 'string' ? error : (error.message || 'Ocurrió un error')} />}
             {success && <div className="text-green-600 mb-4">{successMessage}</div>}
 
-            <form onSubmit={handleSubmit} className="space-y-8" noValidate>
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-8" noValidate>
                 <div className="grid gap-6 md:grid-cols-2">
-                    <FormField label="Nombre" type="text" name="name" value={values.name} onChange={handleChange} onBlur={handleBlur} placeholder="Ej: Producto increíble" required disabled={isLoading || isSubmitting} validationError={errors.name} />
-                    <FormField label="Precio" type="number" name="price" value={values.price} onChange={handleChange} onBlur={handleBlur} placeholder="0.00" required disabled={isLoading || isSubmitting} validationError={errors.price} />
+                    <FormField
+                        label="Nombre"
+                        type="text"
+                        placeholder="Ej: Producto increíble"
+                        required
+                        disabled={isLoading || isFormSubmitting}
+                        validationError={errors.name?.message}
+                        {...register('name')}
+                    />
+                    <FormField
+                        label="Precio"
+                        type="number"
+                        placeholder="0.00"
+                        step="0.01"
+                        required
+                        disabled={isLoading || isFormSubmitting}
+                        validationError={errors.price?.message}
+                        {...register('price')}
+                    />
 
                     <div className="flex items-center gap-3 md:col-span-2">
                         <input
                             type="checkbox"
                             id="onSale"
-                            name="onSale"
-                            checked={values.onSale}
-                            onChange={handleChange}
+                            checked={isOnSale}
+                            onChange={(e) => setIsOnSale(e.target.checked)}
                             className="h-6 w-6 accent-blue-500 border-black cursor-pointer"
                         />
                         <label htmlFor="onSale" className="font-bold text-lg select-none cursor-pointer">
@@ -166,28 +170,44 @@ const ProductForm = ({ product, onSuccess }) => {
                         </label>
                     </div>
 
-                    {values.onSale && (
+                    {isOnSale && (
                         <div>
-                            <FormField label="Descuento (%)" type="number" name="discount" value={values.discount} onChange={handleChange} onBlur={handleBlur} placeholder="Ej: 20" step="0.1" min="0.1" max="100" required disabled={isLoading || isSubmitting} validationError={errors.discount} />
-                            {finalPrice !== null && (
-                                <p className="text-sm text-gray-700 mt-2">Precio final aproximado: <strong>${finalPrice}</strong></p>
+                            <FormField
+                                label="Descuento (0.0 - 1.0)"
+                                type="number"
+                                placeholder="Ej: 0.2 para 20%"
+                                step="0.01"
+                                min="0"
+                                max="1"
+                                required
+                                disabled={isLoading || isFormSubmitting}
+                                validationError={errors.discount?.message}
+                                {...register('discount')}
+                            />
+                            {finalPrice !== null && !isNaN(finalPrice) && (
+                                <p className="text-sm text-gray-700 mt-2">Precio final aproximado: <strong>${finalPrice.toFixed(2)}</strong></p>
                             )}
                         </div>
                     )}
 
-                    <FormField label="Stock" type="number" name="stock" value={values.stock} onChange={handleChange} onBlur={handleBlur} placeholder="0" required disabled={isLoading || isSubmitting} validationError={errors.stock} />
+                    <FormField
+                        label="Stock"
+                        type="number"
+                        placeholder="0"
+                        required
+                        disabled={isLoading || isFormSubmitting}
+                        validationError={errors.stock?.message}
+                        {...register('stock')}
+                    />
 
                     <div className="md:col-span-2">
                         <label htmlFor="category" className="text-2xl font-bold block mb-2 uppercase">Categoría</label>
                         <select
                             id="category"
-                            name="category"
-                            value={values.category}
-                            onChange={handleChange}
-                            onBlur={handleBlur}
                             required
-                            disabled={isLoading || isSubmitting}
+                            disabled={isLoading || isFormSubmitting}
                             className="w-full p-3 border-2 border-black rounded-md font-sans text-lg focus:outline-none focus:ring-2 ring-blue-500 transition-shadow bg-white"
+                            {...register('category')}
                         >
                             <option value="" disabled>Selecciona una categoría</option>
                             {Object.values(PRODUCT_CATEGORIES).map(category => (
@@ -198,19 +218,28 @@ const ProductForm = ({ product, onSuccess }) => {
                         </select>
                         {errors.category && (
                             <p className="text-sm text-red-600 mt-1">
-                                ⚠️ Debes seleccionar una categoría
+                                ⚠️ {errors.category.message}
                             </p>
                         )}
                     </div>
 
                     <div className="md:col-span-2">
-                        <FormField label="Descripción" type="textarea" name="description" value={values.description} onChange={handleChange} onBlur={handleBlur} rows={4} placeholder="Describe el producto..." required disabled={isLoading || isSubmitting} validationError={errors.description} />
+                        <FormField
+                            label="Descripción"
+                            type="textarea"
+                            rows={4}
+                            placeholder="Describe el producto..."
+                            required
+                            disabled={isLoading || isFormSubmitting}
+                            validationError={errors.description?.message}
+                            {...register('description')}
+                        />
                     </div>
 
                     {!isEditMode && (
                         <div className="md:col-span-2">
                             <label className="text-2xl font-bold block mb-2 uppercase">Imagen</label>
-                            <input ref={imageInputRef} name="image" type="file" accept="image/*" onChange={handleImageChange} disabled={isLoading || isSubmitting} />
+                            <input ref={imageInputRef} name="image" type="file" accept="image/*" onChange={handleImageChange} disabled={isLoading || isFormSubmitting} />
                         </div>
                     )}
                 </div>
@@ -228,9 +257,9 @@ const ProductForm = ({ product, onSuccess }) => {
                         type="submit"
                         variant="primary"
                         className="w-full flex-1 order-1 sm:order-2"
-                        disabled={isLoading || isSubmitting || !isFormValid}
+                        disabled={isLoading || isFormSubmitting || !isValid}
                     >
-                        {isLoading || isSubmitting ? buttonLoadingText : buttonText}
+                        {isLoading || isFormSubmitting ? buttonLoadingText : buttonText}
                     </Button>
                 </div>
             </form>
