@@ -1,12 +1,12 @@
-import { useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { loginUser } from '../../store/userSlice';
-import { useForm } from '../../hooks';
-import { isValidEmail, isNotEmpty } from '../../utils';
 import { Button, ErrorGenerico as ErrorForm } from '../common';
 import FormField from '../common/FormField';
 import { toast } from 'react-toastify';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { loginSchema } from '../../utils/validationSchemas';
 
 const LoginForm = () => {
     const navigate = useNavigate();
@@ -16,13 +16,21 @@ const LoginForm = () => {
     
     const from = location.state?.from || '/';
 
-    const validationRules = useMemo(() => ({
-        email: (value) => isValidEmail(value),
-        password: (value) => isNotEmpty(value)
-    }), []);
+    const {
+        register,
+        handleSubmit,
+        formState: { errors, isValid, isSubmitting: isFormSubmitting }
+    } = useForm({
+        resolver: zodResolver(loginSchema),
+        mode: 'onBlur',
+        defaultValues: {
+            username: '',
+            password: ''
+        }
+    });
 
-    const handleLogin = async (formValues) => {
-        const resultAction = await dispatch(loginUser(formValues));
+    const onSubmit = async (data) => {
+        const resultAction = await dispatch(loginUser(data));
         if (loginUser.fulfilled.match(resultAction)) {
             toast.success(`¡Bienvenido de nuevo, ${resultAction.payload.name}! 👋`);
             navigate(from, { replace: true });
@@ -31,60 +39,39 @@ const LoginForm = () => {
         }
     };
 
-    const {values,errors,isSubmitting,handleChange,handleBlur,handleSubmit} = useForm(
-        {email: '', password: ''},
-        handleLogin,
-        validationRules
-    );
-
-    const isFormValid = useMemo(() => {
-        return validationRules.email(values.email) && validationRules.password(values.password);
-    }, [values, validationRules]);
-
     return (
         <>
             {error && <ErrorForm message={error} />}
             
-            <form onSubmit={handleSubmit} className="space-y-6" noValidate>
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6" noValidate>
                 <FormField
-                    label="Email:"
-                    type="email"
-                    name="email"
-                    value={values.email}
-                    onChange={handleChange}
-                    onBlur={handleBlur}
-                    placeholder="tu-email@heroe.com"
-                    autoComplete="email"
+                    label="Usuario:"
+                    type="text"
+                    placeholder="tu-usuario"
+                    autoComplete="username"
                     required
-                    disabled={isSubmitting || isLoading}
-                    validationError={errors.email}
-                    validationSuccess={
-                        values.email && !errors.email 
-                            ? 'Email válido' 
-                            : null
-                    }
+                    disabled={isFormSubmitting || isLoading}
+                    validationError={errors.username?.message}
+                    {...register('username')}
                 />
 
                 <FormField
                     label="Contraseña:"
                     type="password"
-                    name="password"
-                    value={values.password}
-                    onChange={handleChange}
-                    onBlur={handleBlur}
                     placeholder="Tu contraseña secreta"
                     autoComplete="current-password"
                     required
-                    disabled={isSubmitting || isLoading}
-                    validationError={errors.password}
+                    disabled={isFormSubmitting || isLoading}
+                    validationError={errors.password?.message}
+                    {...register('password')}
                 />
                 
                 <Button 
                     type="submit" 
                     variant="primary"
-                    disabled={isSubmitting || isLoading || !isFormValid}
+                    disabled={isFormSubmitting || isLoading || !isValid}
                 >
-                    {isLoading || isSubmitting ? 'Entrando...' : 'Entrar'}
+                    {isLoading || isFormSubmitting ? 'Entrando...' : 'Entrar'}
                 </Button>
             </form>
         </>

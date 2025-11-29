@@ -1,10 +1,10 @@
+import React from 'react';
 import Input from './Input';
 
-const FormField = ({ 
+const FormField = React.forwardRef(({
     label,
     type,
     name,
-    value,
     onChange,
     onBlur,
     placeholder,
@@ -13,8 +13,9 @@ const FormField = ({
     validationSuccess,
     warningMessage,
     autoComplete = 'off',
-    required = false
-}) => {
+    required = false,
+    ...rest
+}, ref) => {
     return (
         <div>
             <Input
@@ -22,13 +23,14 @@ const FormField = ({
                 type={type}
                 id={name}
                 name={name}
-                value={value}
                 onChange={onChange}
                 onBlur={onBlur}
+                ref={ref}
                 placeholder={placeholder}
                 autoComplete={autoComplete}
                 required={required}
                 disabled={disabled}
+                {...rest}
             />
             
             {validationError && (
@@ -50,6 +52,8 @@ const FormField = ({
             )}
         </div>
     );
-};
+});
+
+FormField.displayName = 'FormField';
 
 export default FormField;
