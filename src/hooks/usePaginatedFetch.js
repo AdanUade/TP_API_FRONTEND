@@ -17,22 +17,20 @@ export const usePaginatedFetch = ({
     const [totalElements, setTotalElements] = useState(0);
 
     // Create a stable reference for filters to avoid complexity in dependency array
-    const filtersString = JSON.stringify(filters);
+    const filtersString = JSON.stringify(filters || {});
 
     const loadData = useCallback(() => {
         setIsLoading(true);
         setError(null);
 
-        // Parse filters back or use the prop directly if we trust it won't change during execution
-        // (but props change, so closures capture old values).
-        // However, standard practice is just to list the object if it's small or stable.
-        // Or use the stringified version for comparison.
-        // Here we use the outer 'filters' which is captured.
+        // We use the stringified version to ensure we use the current filters values
+        // without needing to add the 'filters' object to dependencies, which could cause loops
+        const currentFilters = JSON.parse(filtersString);
 
         const params = {
             page,
             size,
-            ...filters
+            ...currentFilters
         };
 
         fetchFunction(params)
@@ -42,20 +40,19 @@ export const usePaginatedFetch = ({
                 setTotalElements(response.totalElements || 0);
             })
             .catch(err => {
-                console.error('Error loading data:', err);
                 setError(err.message || 'Error loading data');
                 setData([]);
             })
             .finally(() => {
                 setIsLoading(false);
             });
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [fetchFunction, page, size, filtersString]);
 
     useEffect(() => {
         if (autoLoad) {
             loadData();
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [loadData, autoLoad, ...dependencies]);
 
     const refetch = () => {
