@@ -3,7 +3,7 @@ import { useDispatch } from 'react-redux';
 import { deleteProduct } from '../../store/productSlice';
 import Button from './Button';
 import ErrorGenerico from './ErrorGenerico';
-import { getToken } from '../../api/AuthApi';
+import { getToken } from '../../utils/token';
 import { toast } from 'react-toastify';
 
 const DeleteProductButton = ({ productId, productName, onDeleted }) => {

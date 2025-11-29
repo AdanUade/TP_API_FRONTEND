@@ -1,5 +1,4 @@
 import { API_ENDPOINTS, DEFAULT_PAGINATION } from '../constants/apiConfig'
-import { getAuthHeaders, getFormDataHeaders } from '../utils/apiHelpers'
 import api from './api'
 
 const BASE_URL = API_ENDPOINTS.PRODUCTS
@@ -48,12 +47,12 @@ export const getProductsOutOfStock = async ({ page = DEFAULT_PAGINATION.PAGE, si
   return response.data
 }
 
-export const createProduct = async ({ productRequest, token }) => {
-  const response = await api.post(BASE_URL, productRequest, { headers: getAuthHeaders(token) })
+export const createProduct = async ({ productRequest }) => {
+  const response = await api.post(BASE_URL, productRequest)
   return response.data
 }
 
-export const createProductWithImage = async ({ productRequest, image, token }) => {
+export const createProductWithImage = async ({ productRequest, image }) => {
   const formData = new FormData()
   formData.append('product', new Blob([JSON.stringify(productRequest)], { type: 'application/json' }))
   if (image) {
@@ -62,19 +61,18 @@ export const createProductWithImage = async ({ productRequest, image, token }) =
 
   const response = await api.post(`${BASE_URL}/with-image`, formData, {
     headers: {
-      ...getFormDataHeaders(token),
       'Content-Type': 'multipart/form-data'
     }
   })
   return response.data
 }
 
-export const updateProduct = async ({ productId, productRequest, token }) => {
-  const response = await api.put(`${BASE_URL}/${productId}`, productRequest, { headers: getAuthHeaders(token) })
+export const updateProduct = async ({ productId, productRequest }) => {
+  const response = await api.put(`${BASE_URL}/${productId}`, productRequest)
   return response.data
 }
 
-export const deleteProduct = async ({ productId, token }) => {
-  const response = await api.delete(`${BASE_URL}/${productId}`, { headers: getAuthHeaders(token) })
+export const deleteProduct = async ({ productId }) => {
+  const response = await api.delete(`${BASE_URL}/${productId}`)
   return response.data
 }

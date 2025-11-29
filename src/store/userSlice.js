@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { isAuthenticated, removeToken, authenticate, register, saveToken } from '../api/AuthApi';
+import { isAuthenticated, removeToken, saveToken } from '../utils/token';
+import { authenticate, register } from '../api/AuthApi';
 import { getUserMe, updateUserMe } from '../api/UserApi';
 
 export const refreshUser = createAsyncThunk(

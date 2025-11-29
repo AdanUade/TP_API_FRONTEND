@@ -8,7 +8,7 @@ import Button from '../common/Button';
 import ErrorGenerico from '../common/ErrorGenerico';
 import { useDispatch, useSelector } from 'react-redux';
 import { createProduct, updateProduct } from '../../store/productSlice';
-import { getToken } from '../../api/AuthApi';
+import { getToken } from '../../utils/token';
 import { toast } from 'react-toastify';
 
 const ProductForm = ({ product, onSuccess }) => {
@@ -35,7 +35,7 @@ const ProductForm = ({ product, onSuccess }) => {
     const handleProductSubmit = async (formValues) => {
         setSuccess(false);
         const token = getToken();
-        
+
         const pct = formValues.onSale ? parseFloat(formValues.discount) : 0;
         const discountForBackend = (100 - Math.max(0, Math.min(100, pct))) / 100;
 
@@ -51,9 +51,9 @@ const ProductForm = ({ product, onSuccess }) => {
         let resultAction;
 
         if (isEditMode) {
-             resultAction = await dispatch(updateProduct({ productId: product.id, productRequest, token }));
+            resultAction = await dispatch(updateProduct({ productId: product.id, productRequest, token }));
         } else {
-             resultAction = await dispatch(createProduct({ productRequest, image, token }));
+            resultAction = await dispatch(createProduct({ productRequest, image, token }));
         }
 
         if (createProduct.fulfilled.match(resultAction) || updateProduct.fulfilled.match(resultAction)) {
@@ -72,7 +72,7 @@ const ProductForm = ({ product, onSuccess }) => {
             toast.error('Error al guardar el producto');
         }
     };
-    
+
     const {
         values,
         errors,
@@ -123,11 +123,11 @@ const ProductForm = ({ product, onSuccess }) => {
 
     const isFormValid = useMemo(() => {
         return validationRules.name(values.name) &&
-               validationRules.description(values.description) &&
-               validationRules.price(values.price) &&
-               validationRules.stock(values.stock) &&
-               validationRules.category(values.category) &&
-               validationRules.discount(values.discount, values);
+            validationRules.description(values.description) &&
+            validationRules.price(values.price) &&
+            validationRules.stock(values.stock) &&
+            validationRules.category(values.category) &&
+            validationRules.discount(values.discount, values);
     }, [values, validationRules]);
 
     const finalPrice = useMemo(() => {
@@ -146,12 +146,12 @@ const ProductForm = ({ product, onSuccess }) => {
         <div className="bg-white border-4 border-black p-8 shadow-[12px_12px_0_0_#1E90FF]">
             {error && <ErrorGenerico message={typeof error === 'string' ? error : (error.message || 'Ocurrió un error')} />}
             {success && <div className="text-green-600 mb-4">{successMessage}</div>}
-            
+
             <form onSubmit={handleSubmit} className="space-y-8" noValidate>
                 <div className="grid gap-6 md:grid-cols-2">
                     <FormField label="Nombre" type="text" name="name" value={values.name} onChange={handleChange} onBlur={handleBlur} placeholder="Ej: Producto increíble" required disabled={isLoading || isSubmitting} validationError={errors.name} />
                     <FormField label="Precio" type="number" name="price" value={values.price} onChange={handleChange} onBlur={handleBlur} placeholder="0.00" required disabled={isLoading || isSubmitting} validationError={errors.price} />
-                    
+
                     <div className="flex items-center gap-3 md:col-span-2">
                         <input
                             type="checkbox"
@@ -176,7 +176,7 @@ const ProductForm = ({ product, onSuccess }) => {
                     )}
 
                     <FormField label="Stock" type="number" name="stock" value={values.stock} onChange={handleChange} onBlur={handleBlur} placeholder="0" required disabled={isLoading || isSubmitting} validationError={errors.stock} />
-                    
+
                     <div className="md:col-span-2">
                         <label htmlFor="category" className="text-2xl font-bold block mb-2 uppercase">Categoría</label>
                         <select
@@ -214,20 +214,20 @@ const ProductForm = ({ product, onSuccess }) => {
                         </div>
                     )}
                 </div>
-                
+
                 <div className="flex flex-col sm:flex-row gap-4 mt-8">
-                    <Button 
+                    <Button
                         type="button"
-                        variant="secondary" 
+                        variant="secondary"
                         onClick={() => navigate(-1)}
                         className="flex-1 order-2 sm:order-1"
                     >
                         ← Volver Atrás
                     </Button>
-                    <Button 
-                        type="submit" 
+                    <Button
+                        type="submit"
                         variant="primary"
-                        className="w-full flex-1 order-1 sm:order-2" 
+                        className="w-full flex-1 order-1 sm:order-2"
                         disabled={isLoading || isSubmitting || !isFormValid}
                     >
                         {isLoading || isSubmitting ? buttonLoadingText : buttonText}
