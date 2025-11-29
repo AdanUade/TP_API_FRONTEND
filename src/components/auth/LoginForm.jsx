@@ -22,7 +22,7 @@ const LoginForm = () => {
         formState: { errors, isValid, isSubmitting: isFormSubmitting }
     } = useForm({
         resolver: zodResolver(loginSchema),
-        mode: 'onBlur',
+        mode: 'onChange',
         defaultValues: {
             email: '',
             password: ''
@@ -45,14 +45,14 @@ const LoginForm = () => {
 
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6" noValidate>
                 <FormField
-                    label="Usuario:"
-                    type="text"
-                    placeholder="tu-usuario"
-                    autoComplete="username"
+                    label="Email:"
+                    type="email"
+                    placeholder="tu-email@ejemplo.com"
+                    autoComplete="email"
                     required
                     disabled={isFormSubmitting || isLoading}
-                    validationError={errors.username?.message}
-                    {...register('username')}
+                    validationError={errors.email?.message}
+                    {...register('email')}
                 />
 
                 <FormField
