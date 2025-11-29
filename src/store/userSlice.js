@@ -4,70 +4,49 @@ import { getUserMe, updateUserMe } from '../api/UserApi';
 
 export const refreshUser = createAsyncThunk(
     'user/refreshUser',
-    async (_, { rejectWithValue }) => {
+    async () => {
         if (!isAuthenticated()) {
             return null;
         }
-        try {
-            const userData = await getUserMe();
-            return userData;
-        } catch (error) {
-            removeToken();
-            return rejectWithValue(error.response?.data || 'Error fetching user');
-        }
+        const userData = await getUserMe();
+        return userData;
     }
 );
 
 export const loginUser = createAsyncThunk(
     'user/login',
-    async (credentials, { dispatch, rejectWithValue }) => {
-        try {
-            const response = await authenticate(credentials);
-            saveToken(response.access_token);
-            const user = await dispatch(refreshUser()).unwrap();
-            return user;
-        } catch (error) {
-            return rejectWithValue(error.message || 'Login failed');
-        }
+    async (credentials, { dispatch }) => {
+        const response = await authenticate(credentials);
+        saveToken(response.access_token);
+        const user = await dispatch(refreshUser()).unwrap();
+        return user;
     }
 );
 
 export const registerUser = createAsyncThunk(
     'user/register',
-    async (userData, { dispatch, rejectWithValue }) => {
-        try {
-            const response = await register(userData);
-            saveToken(response.access_token);
-            const user = await dispatch(refreshUser()).unwrap();
-            return user;
-        } catch (error) {
-            return rejectWithValue(error.message || 'Registration failed');
-        }
+    async (userData, { dispatch }) => {
+        const response = await register(userData);
+        saveToken(response.access_token);
+        const user = await dispatch(refreshUser()).unwrap();
+        return user;
     }
 );
 
 export const updateProfile = createAsyncThunk(
     'user/updateProfile',
-    async (userData, { dispatch, rejectWithValue }) => {
-        try {
-            await updateUserMe(userData);
-            const user = await dispatch(refreshUser()).unwrap();
-            return user;
-        } catch (error) {
-            return rejectWithValue(error.message || 'Update profile failed');
-        }
+    async (userData, { dispatch }) => {
+        await updateUserMe(userData);
+        const user = await dispatch(refreshUser()).unwrap();
+        return user;
     }
 );
 
 export const updatePassword = createAsyncThunk(
     'user/updatePassword',
-    async (passwordData, { rejectWithValue }) => {
-        try {
-            await updateUserMe(passwordData);
-            return;
-        } catch (error) {
-            return rejectWithValue(error.message || 'Update password failed');
-        }
+    async (passwordData) => {
+        await updateUserMe(passwordData);
+        return;
     }
 );
 

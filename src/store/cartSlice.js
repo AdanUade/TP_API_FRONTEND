@@ -5,45 +5,30 @@ import { logoutUser } from './userSlice';
 
 export const loadCartFromServer = createAsyncThunk(
     'cart/loadCartFromServer',
-    async (_, { getState, rejectWithValue }) => {
+    async (_, { getState }) => {
         const user = getState().user.user;
         if (!user) return [];
 
-        try {
-            const serverCart = await CartApi.viewCart();
-            if (serverCart.items && serverCart.items.length > 0) {
-                return serverCart.items.map(adaptServerItemToLocal);
-            }
-            return [];
-        } catch (err) {
-            console.error('Error al cargar carrito del servidor:', err);
-            return rejectWithValue(err.toString());
+        const serverCart = await CartApi.viewCart();
+        if (serverCart.items && serverCart.items.length > 0) {
+            return serverCart.items.map(adaptServerItemToLocal);
         }
+        return [];
     }
 );
 
 export const syncGuestCartToServer = createAsyncThunk(
     'cart/syncGuestCartToServer',
-    async (guestItems, { getState, dispatch, rejectWithValue }) => {
+    async (guestItems, { getState, dispatch }) => {
         const user = getState().user.user;
         if (!guestItems || guestItems.length === 0 || !user) return;
 
-        try {
-            // Recorremos los items locales y los subimos uno por uno
-            for (const item of guestItems) {
-                try {
-                    await CartApi.addToCart(item.id, item.quantity);
-                } catch (innerErr) {
-                    // Si falla uno (ej. duplicado), seguimos con el siguiente
-                    console.warn(`⚠️ No se pudo sincronizar item ${item.id}:`, innerErr);
-                }
-            }
-            // Al final, recargamos el carrito completo del servidor (fusión final)
-            dispatch(loadCartFromServer());
-        } catch (err) {
-            console.error('❌ Error al sincronizar carrito:', err);
-            return rejectWithValue(err.toString());
+        // Recorremos los items locales y los subimos uno por uno
+        for (const item of guestItems) {
+            await CartApi.addToCart(item.id, item.quantity);
         }
+        // Al final, recargamos el carrito completo del servidor (fusión final)
+        dispatch(loadCartFromServer());
     }
 );
 

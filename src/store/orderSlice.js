@@ -3,37 +3,25 @@ import * as OrderApi from '../api/OrderApi';
 
 export const fetchMyOrders = createAsyncThunk(
     'orders/fetchMyOrders',
-    async (_, { rejectWithValue }) => {
-        try {
-            const response = await OrderApi.getMyOrders();
-            return response;
-        } catch (error) {
-            return rejectWithValue(error.response?.data?.message || error.message);
-        }
+    async () => {
+        const response = await OrderApi.getMyOrders();
+        return response;
     }
 );
 
 export const fetchOrderById = createAsyncThunk(
     'orders/fetchOrderById',
-    async (id, { rejectWithValue }) => {
-        try {
-            const response = await OrderApi.getMyOrderById(id);
-            return response;
-        } catch (error) {
-            return rejectWithValue(error.response?.data?.message || error.message);
-        }
+    async (id) => {
+        const response = await OrderApi.getMyOrderById(id);
+        return response;
     }
 );
 
 export const createNewOrder = createAsyncThunk(
     'orders/createOrder',
-    async (orderData, { rejectWithValue }) => {
-        try {
-            const response = await OrderApi.createOrder(orderData);
-            return response;
-        } catch (error) {
-            return rejectWithValue(error.response?.data?.message || error.message);
-        }
+    async (orderData) => {
+        const response = await OrderApi.createOrder(orderData);
+        return response;
     }
 );
 

@@ -4,97 +4,65 @@ import { DEFAULT_PAGINATION } from '../constants/apiConfig';
 
 export const fetchProducts = createAsyncThunk(
     'products/fetchProducts',
-    async (params, { rejectWithValue }) => {
-        try {
-            const response = await ProductApi.getAllProducts(params);
-            return response;
-        } catch (error) {
-            return rejectWithValue(error.response?.data?.message || error.message);
-        }
+    async (params) => {
+        const response = await ProductApi.getAllProducts(params);
+        return response;
     }
 );
 
 export const fetchProductsByCategory = createAsyncThunk(
     'products/fetchProductsByCategory',
-    async ({ category, ...params }, { rejectWithValue }) => {
-        try {
-            const response = await ProductApi.getProductsByCategory({ category, ...params });
-            return response;
-        } catch (error) {
-            return rejectWithValue(error.response?.data?.message || error.message);
-        }
+    async ({ category, ...params }) => {
+        const response = await ProductApi.getProductsByCategory({ category, ...params });
+        return response;
     }
 );
 
 export const fetchProductsOnSale = createAsyncThunk(
     'products/fetchProductsOnSale',
-    async (params, { rejectWithValue }) => {
-        try {
-            const response = await ProductApi.getProductsOnSale(params);
-            return response;
-        } catch (error) {
-            return rejectWithValue(error.response?.data?.message || error.message);
-        }
+    async (params) => {
+        const response = await ProductApi.getProductsOnSale(params);
+        return response;
     }
 );
 
 export const fetchProductById = createAsyncThunk(
     'products/fetchProductById',
-    async (id, { rejectWithValue }) => {
-        try {
-            const response = await ProductApi.getProductById(id);
-            return response;
-        } catch (error) {
-            return rejectWithValue(error.response?.data?.message || error.message);
-        }
+    async (id) => {
+        const response = await ProductApi.getProductById(id);
+        return response;
     }
 );
 
 export const searchProducts = createAsyncThunk(
     'products/searchProducts',
-    async ({ query, page, size }, { rejectWithValue }) => {
-        try {
-            const response = await ProductApi.searchProducts(query, page, size);
-            return response;
-        } catch (error) {
-            return rejectWithValue(error.response?.data?.message || error.message);
-        }
+    async ({ query, page, size }) => {
+        const response = await ProductApi.searchProducts(query, page, size);
+        return response;
     }
 );
 
 export const createProduct = createAsyncThunk(
     'products/createProduct',
-    async ({ productRequest, image, token }, { rejectWithValue }) => {
-        try {
-            const response = await ProductApi.createProductWithImage({ productRequest, image, token });
-            return response;
-        } catch (error) {
-            return rejectWithValue(error.response?.data?.message || error.message);
-        }
+    async ({ productRequest, image, token }) => {
+        const response = await ProductApi.createProductWithImage({ productRequest, image, token });
+        return response;
     }
 );
 
 export const updateProduct = createAsyncThunk(
     'products/updateProduct',
-    async ({ productId, productRequest, token }, { rejectWithValue }) => {
-        try {
-            const response = await ProductApi.updateProduct({ productId, productRequest, token });
-            return response;
-        } catch (error) {
-            return rejectWithValue(error.response?.data?.message || error.message);
-        }
+    async ({ productId, productRequest, token }) => {
+        const response = await ProductApi.updateProduct({ productId, productRequest, token });
+        return response;
     }
 );
 
 export const deleteProduct = createAsyncThunk(
     'products/deleteProduct',
-    async ({ productId, token }, { rejectWithValue }) => {
-        try {
-            await ProductApi.deleteProduct({ productId, token });
-            return productId;
-        } catch (error) {
-            return rejectWithValue(error.response?.data?.message || error.message);
-        }
+    async ({ productId, token }) => {
+        await ProductApi.deleteProduct({ productId, token });
+        return productId;
     }
 );
 

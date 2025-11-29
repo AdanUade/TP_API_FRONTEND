@@ -3,13 +3,9 @@ import { getAllUsers } from '../api/UserApi';
 
 export const fetchUsers = createAsyncThunk(
     'adminUsers/fetchUsers',
-    async (params, { rejectWithValue }) => {
-        try {
-            const response = await getAllUsers(params);
-            return response;
-        } catch (error) {
-            return rejectWithValue(error.response?.data?.message || error.message);
-        }
+    async (params) => {
+        const response = await getAllUsers(params);
+        return response;
     }
 );
 
