@@ -1,7 +1,7 @@
-import { TOKEN_KEY } from '../constants/apiConfig';
+import { getToken } from '../api/AuthApi';
 
 export const getAuthHeaders = (token) => {
-    const authToken = token || localStorage.getItem(TOKEN_KEY);
+    const authToken = token || getToken();
     
     const headers = {
         'Content-Type': 'application/json',
@@ -15,7 +15,7 @@ export const getAuthHeaders = (token) => {
 };
 
 export const getFormDataHeaders = (token) => {
-    const authToken = token || localStorage.getItem(TOKEN_KEY);
+    const authToken = token || getToken();
     
     const headers = {};
     
