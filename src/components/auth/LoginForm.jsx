@@ -13,7 +13,7 @@ const LoginForm = () => {
     const location = useLocation();
     const dispatch = useDispatch();
     const { isLoading, error } = useSelector(state => state.user);
-    
+
     const from = location.state?.from || '/';
 
     const {
@@ -24,7 +24,7 @@ const LoginForm = () => {
         resolver: zodResolver(loginSchema),
         mode: 'onBlur',
         defaultValues: {
-            username: '',
+            email: '',
             password: ''
         }
     });
@@ -42,7 +42,7 @@ const LoginForm = () => {
     return (
         <>
             {error && <ErrorForm message={error} />}
-            
+
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6" noValidate>
                 <FormField
                     label="Usuario:"
@@ -65,9 +65,9 @@ const LoginForm = () => {
                     validationError={errors.password?.message}
                     {...register('password')}
                 />
-                
-                <Button 
-                    type="submit" 
+
+                <Button
+                    type="submit"
                     variant="primary"
                     disabled={isFormSubmitting || isLoading || !isValid}
                 >
