@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { updatePassword } from '../../store/userSlice';
@@ -17,6 +17,7 @@ const NewPasswordForm = () => {
     const dispatch = useDispatch();
     const { isLoading, error } = useSelector(state => state.user);
     const [success, setSuccess] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     const {
         register,
@@ -36,21 +37,31 @@ const NewPasswordForm = () => {
     const watchedNewPassword = useWatch({ control, name: 'newPassword' });
     const watchedConfirmPassword = useWatch({ control, name: 'confirmNewPassword' });
 
-    const handleUpdatePassword = async (data) => {
-        const resultAction = await dispatch(updatePassword({
-            oldPassword: data.currentPassword, // Assuming backend needs old password too? Schema had it.
+    const handleUpdatePassword = (data) => {
+        setIsSubmitting(true);
+        dispatch(updatePassword({
+            oldPassword: data.currentPassword,
             password: data.newPassword
         }));
-        if (updatePassword.fulfilled.match(resultAction)) {
-            setSuccess(true);
-            toast.success('Contraseña actualizada correctamente');
-            setTimeout(() => {
-                navigate('/perfil');
-            }, 2000);
-        } else {
-            toast.error(resultAction.payload || 'Error al actualizar contraseña');
-        }
     };
+
+    useEffect(() => {
+        // Detecta cuando termina el loading
+        if (isSubmitting && !isLoading) {
+            if (!error) {
+                // Actualización exitosa
+                setSuccess(true);
+                toast.success('Contraseña actualizada correctamente');
+                setTimeout(() => {
+                    navigate('/perfil');
+                }, 2000);
+            } else {
+                // Error al actualizar
+                toast.error(error || 'Error al actualizar contraseña');
+            }
+            setIsSubmitting(false);
+        }
+    }, [isSubmitting, isLoading, error, navigate]);
 
     const handleCancel = () => {
         navigate('/perfil');
@@ -89,14 +100,14 @@ const NewPasswordForm = () => {
                     validationError={errors.newPassword?.message}
                     warningMessage={
                         watchedNewPassword &&
-                        watchedNewPassword.length > 0 &&
-                        watchedNewPassword.length < MIN_PASSWORD_LENGTH
+                            watchedNewPassword.length > 0 &&
+                            watchedNewPassword.length < MIN_PASSWORD_LENGTH
                             ? `Faltan ${MIN_PASSWORD_LENGTH - watchedNewPassword.length} caracteres más`
                             : null
                     }
                     validationSuccess={
                         watchedNewPassword && !errors.newPassword && watchedNewPassword.length >= MIN_PASSWORD_LENGTH
-                            ? 'Contraseña válida' 
+                            ? 'Contraseña válida'
                             : null
                     }
                     {...register('newPassword')}
@@ -112,32 +123,32 @@ const NewPasswordForm = () => {
                     validationError={errors.confirmNewPassword?.message}
                     warningMessage={
                         watchedConfirmPassword &&
-                        watchedNewPassword !== watchedConfirmPassword
+                            watchedNewPassword !== watchedConfirmPassword
                             ? 'Las contraseñas no coinciden'
                             : null
                     }
                     validationSuccess={
                         watchedConfirmPassword &&
-                        !errors.confirmNewPassword &&
-                        watchedNewPassword === watchedConfirmPassword &&
-                        watchedNewPassword.length >= MIN_PASSWORD_LENGTH
-                            ? 'Las contraseñas coinciden' 
+                            !errors.confirmNewPassword &&
+                            watchedNewPassword === watchedConfirmPassword &&
+                            watchedNewPassword.length >= MIN_PASSWORD_LENGTH
+                            ? 'Las contraseñas coinciden'
                             : null
                     }
                     {...register('confirmNewPassword')}
                 />
 
                 <div className="flex flex-col sm:flex-row gap-4">
-                    <Button 
-                        type="submit" 
+                    <Button
+                        type="submit"
                         variant="success"
                         disabled={isFormSubmitting || isLoading || !isValid}
                         className="flex-1"
                     >
                         {isLoading || isFormSubmitting ? 'Actualizando...' : 'Actualizar Contraseña'}
                     </Button>
-                    
-                    <Button 
+
+                    <Button
                         type="button"
                         onClick={handleCancel}
                         variant="danger"

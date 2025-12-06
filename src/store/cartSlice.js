@@ -128,9 +128,23 @@ export const selectCartSavings = createSelector(
 
 // Thunks
 export const addToCart = ({ product, image, quantity = 1 }) => (dispatch, getState) => {
-    const user = getState().user.user;
+    const state = getState();
+    const user = state.user.user;
 
     if (user && (user.rol === 'SELLER' || user.rol === 'ADMIN')) return;
+
+    // Verificar stock disponible
+    const existingItem = state.cart.items.find(item => item.id === product.id);
+    const currentQuantity = existingItem ? existingItem.quantity : 0;
+    const newTotalQuantity = currentQuantity + quantity;
+
+    if (newTotalQuantity > product.stock) {
+        const remaining = product.stock - currentQuantity;
+        if (remaining <= 0) {
+            return { error: 'Stock máximo alcanzado' };
+        }
+        return { error: `Solo puedes agregar ${remaining} unidad(es) más` };
+    }
 
     dispatch(localAddToCart({ product, image, quantity }));
 

@@ -66,6 +66,14 @@ export const deleteProduct = createAsyncThunk(
     }
 );
 
+export const fetchProductsOutOfStock = createAsyncThunk(
+    'products/fetchProductsOutOfStock',
+    async (params) => {
+        const response = await ProductApi.getProductsOutOfStock(params);
+        return response;
+    }
+);
+
 const initialState = {
     items: [],
     selectedProduct: null,
@@ -200,7 +208,12 @@ const productSlice = createSlice({
             .addCase(deleteProduct.rejected, (state, action) => {
                 state.isLoading = false;
                 state.error = action.payload;
-            });
+            })
+
+            // Fetch Products Out Of Stock
+            .addCase(fetchProductsOutOfStock.pending, handlePending)
+            .addCase(fetchProductsOutOfStock.fulfilled, handleFulfilledList)
+            .addCase(fetchProductsOutOfStock.rejected, handleRejected);
     }
 });
 

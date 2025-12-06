@@ -1,8 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { deleteProduct } from '../../store/productSlice';
 import Button from './Button';
-import ErrorGenerico from './ErrorGenerico';
 import { getToken } from '../../utils/token';
 import { toast } from 'react-toastify';
 
@@ -10,44 +9,54 @@ const DeleteProductButton = ({ productId, productName, onDeleted }) => {
     const dispatch = useDispatch();
     const [confirming, setConfirming] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [isDeleting, setIsDeleting] = useState(false);
+    const [deleteResult, setDeleteResult] = useState(null);
 
     const startDelete = () => setConfirming(true);
     const cancelDelete = () => setConfirming(false);
 
-    const confirmDelete = async () => {
-        setLoading(true);
-        try {
-            const token = getToken();
-            console.debug('DeleteProductButton: token present?', !!token);
-            if (!token) {
-                throw new Error('No se encontró token de autenticación. Inicia sesión e intenta de nuevo.');
-            }
-
-            const resultAction = await dispatch(deleteProduct({ productId, token }));
-
-            if (deleteProduct.fulfilled.match(resultAction)) {
-                toast.success(`Producto "${productName}" eliminado correctamente`);
-                setConfirming(false);
-                if (onDeleted) onDeleted(productId);
-            } else {
-                throw resultAction.payload || new Error('Error al eliminar');
-            }
-        } catch (err) {
-            console.error('DeleteProductButton: error deleting product', err);
-            let msg = 'Error al eliminar el producto';
-            if (err) {
-                if (typeof err === 'string') msg = err;
-                else if (err.message) msg = err.message;
-                else {
-                    try { msg = JSON.stringify(err); } catch { /* ignore */ }
-                }
-            }
-            toast.error(msg);
-            setConfirming(false);
-        } finally {
-            setLoading(false);
+    const confirmDelete = () => {
+        const token = getToken();
+        if (!token) {
+            toast.error('No se encontró token de autenticación. Inicia sesión e intenta de nuevo.');
+            return;
         }
+
+        setLoading(true);
+        setIsDeleting(true);
+        const resultAction = dispatch(deleteProduct({ productId, token }));
+        setDeleteResult(resultAction);
     };
+
+    useEffect(() => {
+        // Detecta cuando termina el loading y hay un resultado
+        if (isDeleting && deleteResult) {
+            Promise.resolve(deleteResult).then((result) => {
+                if (deleteProduct.fulfilled.match(result)) {
+                    // Eliminación exitosa
+                    toast.success(`Producto "${productName}" eliminado correctamente`);
+                    setConfirming(false);
+                    if (onDeleted) onDeleted(productId);
+                } else {
+                    // Error al eliminar
+                    const err = result.payload || 'Error al eliminar';
+                    let msg = 'Error al eliminar el producto';
+                    if (err) {
+                        if (typeof err === 'string') msg = err;
+                        else if (err.message) msg = err.message;
+                        else {
+                            try { msg = JSON.stringify(err); } catch { /* ignore */ }
+                        }
+                    }
+                    toast.error(msg);
+                    setConfirming(false);
+                }
+                setLoading(false);
+                setIsDeleting(false);
+                setDeleteResult(null);
+            });
+        }
+    }, [isDeleting, deleteResult, productId, productName, onDeleted]);
 
     return (
         <>

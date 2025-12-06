@@ -7,20 +7,18 @@ import { toast } from 'react-toastify';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { loginSchema } from '../../utils/validationSchemas';
+import { useEffect, useState } from 'react';
 
 const LoginForm = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const dispatch = useDispatch();
-    const { isLoading, error } = useSelector(state => state.user);
+    const { isLoading, error, user } = useSelector(state => state.user);
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     const from = location.state?.from || '/';
 
-    const {
-        register,
-        handleSubmit,
-        formState: { errors, isValid, isSubmitting: isFormSubmitting }
-    } = useForm({
+    const { register, handleSubmit, formState: { errors, isValid, isSubmitting: isFormSubmitting } } = useForm({
         resolver: zodResolver(loginSchema),
         mode: 'onChange',
         defaultValues: {
@@ -29,15 +27,25 @@ const LoginForm = () => {
         }
     });
 
-    const onSubmit = async (data) => {
-        const resultAction = await dispatch(loginUser(data));
-        if (loginUser.fulfilled.match(resultAction)) {
-            toast.success(`¡Bienvenido de nuevo, ${resultAction.payload.name}! 👋`);
-            navigate(from, { replace: true });
-        } else {
-            toast.error(resultAction.payload || 'Error al iniciar sesión');
-        }
+    const onSubmit = (data) => {
+        setIsSubmitting(true);
+        dispatch(loginUser(data));
     };
+
+    useEffect(() => {
+        // Detecta cuando termina el loading
+        if (isSubmitting && !isLoading) {
+            if (user && !error) {
+                // Login exitoso
+                toast.success(`¡Bienvenido de nuevo, ${user.name}! 👋`);
+                navigate(from, { replace: true });
+            } else if (error) {
+                // Login fallido
+                toast.error(error || 'Error al iniciar sesión');
+            }
+            setIsSubmitting(false);
+        }
+    }, [isSubmitting, isLoading, user, error, navigate, from]);
 
     return (
         <>

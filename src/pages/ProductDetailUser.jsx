@@ -12,17 +12,13 @@ import CardImage from '../components/products/CardImage';
 import ProductInfo from '../components/products/ProductInfo';
 import ProductActions from '../components/products/ProductActions';
 
-/**
- * Vista de detalle de producto para USUARIOS REGULARES
- * Incluye funcionalidad de carrito y compra
- */
 const ProductDetailUser = () => {
     const { productId } = useParams();
     const navigate = useNavigate();
     const dispatch = useDispatch();
-    
+
     const [quantity, setQuantity] = useState(1);
-    
+
     const { selectedProduct: product, isLoading, error } = useSelector(state => state.products);
 
     useEffect(() => {
@@ -44,7 +40,7 @@ const ProductDetailUser = () => {
 
     const handleAddToCart = useCallback(() => {
         if (product) {
-            dispatch(addToCart({product, image: product.imageFile, quantity}));
+            dispatch(addToCart({ product, image: product.imageFile, quantity }));
         }
     }, [dispatch, product, quantity]);
 
@@ -60,12 +56,12 @@ const ProductDetailUser = () => {
             </>
         );
     }
-    
+
     if (error || !product) {
         return (
             <>
                 <PageTitle title="Producto" subtitle="Detalles del héroe" />
-                <ErrorGenerico 
+                <ErrorGenerico
                     title="¡ZAP! Producto no encontrado"
                     message={error || "Parece que este artículo fue víctima de un rayo desintegrador."}
                     variant="page"
@@ -80,16 +76,16 @@ const ProductDetailUser = () => {
     }
 
     const { isOutOfStock, onSale, finalPrice, oldPrice } = productInfo;
-    
+
     return (
         <div>
-            <PageTitle 
-                title={product.name} 
-                subtitle={`Categoría: ${product.category || 'Producto'}`} 
+            <PageTitle
+                title={product.name}
+                subtitle={`Categoría: ${product.category || 'Producto'}`}
             />
-            
+
             <div className="grid md:grid-cols-2 gap-8 bg-white border-4 border-black p-6 md:p-8 rounded-lg shadow-[12px_12px_0_0_#000]">
-                
+
                 <CardImage
                     id={product.id}
                     image={product.imageFile}
@@ -99,7 +95,7 @@ const ProductDetailUser = () => {
                     size="detail"
                     showLink={false}
                 />
-                
+
                 <div className="flex flex-col gap-4">
                     <ProductInfo
                         product={product}
@@ -109,7 +105,7 @@ const ProductDetailUser = () => {
                         isOutOfStock={isOutOfStock}
                         onSale={onSale}
                     />
-                    
+
                     <ProductActions
                         quantity={quantity}
                         onQuantityChange={handleQuantityChange}

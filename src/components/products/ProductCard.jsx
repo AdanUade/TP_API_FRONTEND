@@ -10,8 +10,12 @@ const ProductCard = ({ product }) => {
     const outOfStock = isProductOutOfStock(product);
 
     const handleAddToCart = () => {
-        dispatch(addToCart({product, image: product.imageFile}));
-        toast.success(`¡${product.name} añadido al carrito! 🛒`);
+        const result = dispatch(addToCart({ product, image: product.imageFile }));
+        if (result && result.error) {
+            toast.error(result.error);
+        } else {
+            toast.success(`¡${product.name} añadido al carrito! 🛒`);
+        }
     };
 
     return (

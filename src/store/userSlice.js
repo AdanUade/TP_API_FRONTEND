@@ -19,8 +19,8 @@ export const loginUser = createAsyncThunk(
     async (credentials, { dispatch }) => {
         const response = await authenticate(credentials);
         saveToken(response.access_token);
-        const user = await dispatch(refreshUser()).unwrap();
-        return user;
+        const action = await dispatch(refreshUser());
+        return action.payload;
     }
 );
 
@@ -29,8 +29,8 @@ export const registerUser = createAsyncThunk(
     async (userData, { dispatch }) => {
         const response = await register(userData);
         saveToken(response.access_token);
-        const user = await dispatch(refreshUser()).unwrap();
-        return user;
+        const action = await dispatch(refreshUser());
+        return action.payload;
     }
 );
 
@@ -38,8 +38,8 @@ export const updateProfile = createAsyncThunk(
     'user/updateProfile',
     async (userData, { dispatch }) => {
         await updateUserMe(userData);
-        const user = await dispatch(refreshUser()).unwrap();
-        return user;
+        const action = await dispatch(refreshUser());
+        return action.payload;
     }
 );
 
@@ -66,11 +66,7 @@ const userSlice = createSlice({
         isLoading: false,
         error: null,
     },
-    reducers: {
-        setUser: (state, action) => {
-            state.user = action.payload;
-        },
-    },
+    reducers: {},
     extraReducers: (builder) => {
         builder
             .addCase(refreshUser.pending, (state) => {
